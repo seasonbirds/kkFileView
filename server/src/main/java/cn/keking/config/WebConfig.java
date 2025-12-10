@@ -1,11 +1,13 @@
 package cn.keking.config;
 
+import cn.keking.filter.SourceFileDownloadInterceptor;
 import cn.keking.web.filter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -98,5 +100,15 @@ public class WebConfig implements WebMvcConfigurer {
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
         return registrationBean;
+    }
+    
+    /**
+     * 注册拦截器
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // 注册源文件下载拦截器，只对/downloadSourceFile路径进行拦截
+        registry.addInterceptor(new SourceFileDownloadInterceptor())
+                .addPathPatterns("/downloadSourceFile");
     }
 }

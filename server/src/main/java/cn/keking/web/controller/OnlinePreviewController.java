@@ -6,6 +6,8 @@ import cn.keking.service.FilePreview;
 import cn.keking.service.FilePreviewFactory;
 import cn.keking.service.cache.CacheService;
 import cn.keking.service.impl.OtherFilePreviewImpl;
+import cn.keking.config.ConfigConstants;
+import cn.keking.utils.IpUtils;
 import cn.keking.utils.KkFileUtils;
 import cn.keking.utils.WebUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -184,5 +186,78 @@ public class OnlinePreviewController {
         logger.info("添加转码队列url：{}", url);
         cacheService.addQueueTask(url);
         return "success";
+    }
+
+    /**
+     * 下载源文件接口
+     */
+    @GetMapping("/downloadSourceFile")
+    public void downloadSourceFile(String url, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // 检查功能是否启用
+        if (!ConfigConstants.isSourceFileDownloadEnabled()) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "下载功能未启用");
+            return;
+        }
+
+        // 解码URL
+        String fileUrl;
+        try {
+            fileUrl = WebUtils.decodeUrl(url);
+        } catch (Exception ex) {
+            logger.error("URL解码失败: {}", url, ex);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "URL格式错误");
+            return;
+        }
+
+        logger.info("下载文件: {}", fileUrl);
+
+        // 获取文件属性
+        FileAttribute fileAttribute = fileHandlerService.getFileAttribute(fileUrl, request);
+        String fileName = fileAttribute.getName();
+
+        // 设置响应头
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=" + WebUtils.encodeFileName(fileName));
+
+        // 使用getCorsFile类似的方式获取文件内容
+        URL urlObj;
+        try {
+            urlObj = WebUtils.normalizedURL(fileUrl);
+        } catch (Exception ex) {
+            logger.error("URL标准化失败: {}", fileUrl, ex);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "URL格式错误");
+            return;
+        }
+
+        // 检查URL协议安全性
+        if (!fileUrl.toLowerCase().startsWith("http") && !fileUrl.toLowerCase().startsWith("https") && !fileUrl.toLowerCase().startsWith("ftp")) {
+            logger.warn("不支持的协议类型，可能存在安全风险: {}", fileUrl);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "不支持的文件协议");
+            return;
+        }
+
+        // 读取并输出文件内容
+        try {
+            if (!fileUrl.toLowerCase().startsWith("ftp:")) {
+                factory.setConnectionRequestTimeout(2000);
+                factory.setConnectTimeout(10000);
+                factory.setReadTimeout(72000);
+                restTemplate.setRequestFactory(factory);
+                RequestCallback requestCallback = req -> {
+                    req.getHeaders().setAccept(java.util.Arrays.asList(MediaType.APPLICATION_OCTET_STREAM, MediaType.ALL));
+                };
+                restTemplate.execute(urlObj.toURI(), HttpMethod.GET, requestCallback, res -> {
+                    IOUtils.copy(res.getBody(), response.getOutputStream());
+                    return null;
+                });
+            } else {
+                try (InputStream inputStream = urlObj.openStream()) {
+                    IOUtils.copy(inputStream, response.getOutputStream());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("下载文件失败: {}", fileUrl, e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "下载文件失败");
+        }
     }
 }

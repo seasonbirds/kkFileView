@@ -50,6 +50,8 @@ public class ConfigConstants {
     private static String size;
     private static String password;
     private static int pdf2JpgDpi;
+    private static Boolean sourceFileDownloadEnabled;
+    private static CopyOnWriteArraySet<String> sourceFileDownloadIpWhiteList;
     private static String officeTypeWeb;
     private static String cadPreviewType;
     private static Boolean deleteSourceFile;
@@ -97,6 +99,8 @@ public class ConfigConstants {
     public static final String DEFAULT_PDF2_JPG_DPI = "105";
     public static final String DEFAULT_OFFICE_TYPE_WEB = "web";
     public static final String DEFAULT_DELETE_SOURCE_FILE = "true";
+    public static final String DEFAULT_SOURCE_FILE_DOWNLOAD_ENABLED = "false";
+    public static final String DEFAULT_SOURCE_FILE_DOWNLOAD_IP_WHITE_LIST = "";
     public static final String DEFAULT_DELETE_CAPTCHA = "false";
     public static final String DEFAULT_CAD_TIMEOUT = "90";
     public static final String DEFAULT_CAD_THREAD = "5";
@@ -502,6 +506,38 @@ public class ConfigConstants {
 
     public static void setPdf2JpgDpiValue(int pdf2JpgDpi) {
         ConfigConstants.pdf2JpgDpi = pdf2JpgDpi;
+    }
+
+    public static Boolean isSourceFileDownloadEnabled() {
+        return sourceFileDownloadEnabled;
+    }
+
+    @Value("${source.file.download.enabled:false}")
+    public void setSourceFileDownloadEnabled(String sourceFileDownloadEnabled) {
+        setSourceFileDownloadEnabledValue(Boolean.parseBoolean(sourceFileDownloadEnabled));
+    }
+
+    public static void setSourceFileDownloadEnabledValue(Boolean sourceFileDownloadEnabled) {
+        ConfigConstants.sourceFileDownloadEnabled = sourceFileDownloadEnabled;
+    }
+
+    public static Set<String> getSourceFileDownloadIpWhiteList() {
+        return sourceFileDownloadIpWhiteList;
+    }
+
+    @Value("${source.file.download.ip.white.list:}")
+    public void setSourceFileDownloadIpWhiteList(String ipWhiteList) {
+        if (DEFAULT_VALUE.equalsIgnoreCase(ipWhiteList)) {
+            setSourceFileDownloadIpWhiteListValue(new CopyOnWriteArraySet<>());
+        } else {
+            // 去除空格并转小写
+            String[] ipArray = ipWhiteList.toLowerCase().replaceAll("\\s+", "").split(",");
+            setSourceFileDownloadIpWhiteListValue(new CopyOnWriteArraySet<>(Arrays.asList(ipArray)));
+        }
+    }
+
+    public static void setSourceFileDownloadIpWhiteListValue(CopyOnWriteArraySet<String> sourceFileDownloadIpWhiteList) {
+        ConfigConstants.sourceFileDownloadIpWhiteList = sourceFileDownloadIpWhiteList;
     }
 
     public static String getOfficeTypeWeb() {
