@@ -18,6 +18,9 @@
 <#if "false" == switchDisabled>
     <img src="images/jpg.svg" width="48" height="48" style="position: fixed; cursor: pointer; top: 40%; right: 48px; z-index: 999;" alt="使用图片预览" title="使用图片预览" onclick="goForImage()"/>
 </#if>
+<#if "true" == showDownloadSource>
+    <img src="images/download.svg" width="48" height="48" style="position: fixed; cursor: pointer; top: 50%; right: 48px; z-index: 999;" alt="下载源文件" title="下载源文件" onclick="downloadSourceFile()"/>
+</#if>
 </body>
 
 <script type="text/javascript">
@@ -51,6 +54,12 @@
             url = url + "&officePreviewType=image";
         }
         window.location.href = url;
+    }
+    
+    function downloadSourceFile() {
+        var url = window.location.href;
+        var downloadUrl = '/downloadSourceFile?url=' + encodeURIComponent(url);
+        window.open(downloadUrl, '_blank');
     }
 
     /*初始化水印*/
