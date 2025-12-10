@@ -1,6 +1,7 @@
 package cn.keking.config;
 
 import cn.keking.web.filter.*;
+import cn.keking.utils.IpWhitelistUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -20,6 +21,12 @@ import java.util.Set;
 public class WebConfig implements WebMvcConfigurer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(WebConfig.class);
+    
+    private final IpWhitelistUtils ipWhitelistUtils;
+    
+    public WebConfig(IpWhitelistUtils ipWhitelistUtils) {
+        this.ipWhitelistUtils = ipWhitelistUtils;
+    }
     /**
      * 访问外部文件配置
      */
@@ -97,6 +104,18 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<SourceFileDownloadIpFilter> getSourceFileDownloadIpFilter() {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/downloadSourceFile");
+        SourceFileDownloadIpFilter filter = new SourceFileDownloadIpFilter(ipWhitelistUtils);
+        FilterRegistrationBean<SourceFileDownloadIpFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(15);
         return registrationBean;
     }
 }

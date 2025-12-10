@@ -112,6 +112,8 @@ public class OfficeFilePreviewImpl implements FilePreview {
             return getPreviewType(model, fileAttribute, officePreviewType, cacheName, outFilePath, fileHandlerService, OFFICE_PREVIEW_TYPE_IMAGE, otherFilePreview);
         }
         model.addAttribute("pdfUrl", WebUtils.encodeFileName(cacheName));  //输出转义文件名 方便url识别
+        // 添加是否显示下载源文件按钮的标志
+        model.addAttribute("showDownloadSource", "doc".equalsIgnoreCase(suffix) || "docx".equalsIgnoreCase(suffix));
         return isHtmlView ? EXEL_FILE_PREVIEW_PAGE : PDF_FILE_PREVIEW_PAGE;
     }
 
@@ -137,6 +139,8 @@ public class OfficeFilePreviewImpl implements FilePreview {
         }
         model.addAttribute("imgUrls", imageUrls);
         model.addAttribute("currentUrl", imageUrls.get(0));
+        // 添加是否显示下载源文件按钮的标志（仅在图片预览模式下）
+        model.addAttribute("showDownloadSource", "doc".equalsIgnoreCase(suffix) || "docx".equalsIgnoreCase(suffix));
         if (officePreviewTypeImage.equals(officePreviewType)) {
             // PPT 图片模式使用专用预览页面
             return (isPPT ? PPT_FILE_PREVIEW_PAGE : OFFICE_PICTURE_FILE_PREVIEW_PAGE);

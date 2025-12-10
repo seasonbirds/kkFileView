@@ -40,6 +40,9 @@
 <#if "false" == switchDisabled>
     <img src="images/pdf.svg" width="48" height="48" style="position: fixed; cursor: pointer; top: 40%; right: 48px; z-index: 999;" alt="使用PDF预览" title="使用PDF预览" onclick="changePreviewType('pdf')"/>
 </#if>
+<#if "true" == showDownloadSource>
+    <img src="images/download.svg" width="48" height="48" style="position: fixed; cursor: pointer; top: 50%; right: 48px; z-index: 999;" alt="下载源文件" title="下载源文件" onclick="downloadSourceFile()"/>
+</#if>
 <script>
     window.onload = function () {
         /*初始化水印*/
@@ -59,6 +62,12 @@
         } else {
             window.location.href = url;
         }
+    }
+    
+    function downloadSourceFile() {
+        var url = window.location.href;
+        var downloadUrl = '/downloadSourceFile?url=' + encodeURIComponent(url);
+        window.open(downloadUrl, '_blank');
     }
 </script>
 </body>

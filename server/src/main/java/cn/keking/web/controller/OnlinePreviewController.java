@@ -1,5 +1,7 @@
 package cn.keking.web.controller;
 
+import cn.keking.config.ConfigConstants;
+import cn.keking.config.IpWhitelistConfig;
 import cn.keking.model.FileAttribute;
 import cn.keking.service.FileHandlerService;
 import cn.keking.service.FilePreview;
@@ -52,15 +54,17 @@ public class OnlinePreviewController {
     private final CacheService cacheService;
     private final FileHandlerService fileHandlerService;
     private final OtherFilePreviewImpl otherFilePreview;
+    private final IpWhitelistConfig ipWhitelistConfig;
     private static final RestTemplate restTemplate = new RestTemplate();
     private static  final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public OnlinePreviewController(FilePreviewFactory filePreviewFactory, FileHandlerService fileHandlerService, CacheService cacheService, OtherFilePreviewImpl otherFilePreview) {
+    public OnlinePreviewController(FilePreviewFactory filePreviewFactory, FileHandlerService fileHandlerService, CacheService cacheService, OtherFilePreviewImpl otherFilePreview, IpWhitelistConfig ipWhitelistConfig) {
         this.previewFactory = filePreviewFactory;
         this.fileHandlerService = fileHandlerService;
         this.cacheService = cacheService;
         this.otherFilePreview = otherFilePreview;
+        this.ipWhitelistConfig = ipWhitelistConfig;
     }
 
     @GetMapping( "/onlinePreview")
@@ -73,6 +77,22 @@ public class OnlinePreviewController {
             String errorMsg = String.format(BASE64_DECODE_ERROR_MSG, "url");
             return otherFilePreview.notSupportedFile(model, errorMsg);
         }
+        
+        // IP白名单检查
+        String clientIp = getClientIp(req);
+        if (!isIpAllowed(clientIp)) {
+            logger.warn("IP {} 不在白名单中，拒绝访问", clientIp);
+            return otherFilePreview.notSupportedFile(model, "您的IP地址不在允许访问的白名单中");
+        }
+        
+        // 如果启用了新的IP白名单配置，使用新的检查逻辑
+        if (ipWhitelistConfig.isEnabled()) {
+            if (!isIpInWhitelist(clientIp)) {
+                logger.warn("IP {} 不在新的白名单中，拒绝访问", clientIp);
+                return otherFilePreview.notSupportedFile(model, "您的IP地址不在允许访问的白名单中");
+            }
+        }
+        
         FileAttribute fileAttribute = fileHandlerService.getFileAttribute(fileUrl, req);  //这里不在进行URL 处理了
         model.addAttribute("file", fileAttribute);
         FilePreview filePreview = previewFactory.get(fileAttribute);
@@ -184,5 +204,126 @@ public class OnlinePreviewController {
         logger.info("添加转码队列url：{}", url);
         cacheService.addQueueTask(url);
         return "success";
+    }
+
+    /**
+     * 获取客户端IP地址
+     */
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        // 如果是多级代理，取第一个IP
+        if (ip != null && ip.contains(",")) {
+            ip = ip.substring(0, ip.indexOf(",")).trim();
+        }
+        return ip;
+    }
+
+    /**
+     * 检查IP是否在白名单中
+     */
+    private boolean isIpAllowed(String clientIp) {
+        String whitelist = ConfigConstants.getIpWhitelist();
+        if (whitelist == null || whitelist.trim().isEmpty()) {
+            // 白名单为空时允许所有访问
+            return true;
+        }
+        
+        String[] allowedIps = whitelist.split(",");
+        for (String allowedIp : allowedIps) {
+            allowedIp = allowedIp.trim();
+            if (allowedIp.equals(clientIp)) {
+                return true;
+            }
+            // 支持通配符匹配，如 192.168.1.*
+            if (allowedIp.contains("*")) {
+                String regex = allowedIp.replace(".", "\\.").replace("*", ".*");
+                if (clientIp.matches(regex)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 检查IP是否在新的白名单配置中
+     */
+    private boolean isIpInWhitelist(String clientIp) {
+        List<String> allowedIps = ipWhitelistConfig.getAllowedIps();
+        
+        for (String allowedIp : allowedIps) {
+            allowedIp = allowedIp.trim();
+            
+            // 检查是否是单个IP地址
+            if (allowedIp.equals(clientIp)) {
+                return true;
+            }
+            
+            // 检查是否是IP段（如 192.168.1.1-192.168.1.255）
+            if (allowedIp.contains("-")) {
+                String[] ipRange = allowedIp.split("-");
+                if (ipRange.length == 2) {
+                    String startIp = ipRange[0].trim();
+                    String endIp = ipRange[1].trim();
+                    if (isIpInRange(clientIp, startIp, endIp)) {
+                        return true;
+                    }
+                }
+            }
+            
+            // 支持通配符匹配，如 192.168.1.*
+            if (allowedIp.contains("*")) {
+                String regex = allowedIp.replace(".", "\\.").replace("*", ".*");
+                if (clientIp.matches(regex)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * 检查IP地址是否在指定范围内
+     */
+    private boolean isIpInRange(String clientIp, String startIp, String endIp) {
+        try {
+            long clientIpLong = ipToLong(clientIp);
+            long startIpLong = ipToLong(startIp);
+            long endIpLong = ipToLong(endIp);
+            
+            return clientIpLong >= startIpLong && clientIpLong <= endIpLong;
+        } catch (Exception e) {
+            logger.error("IP地址范围检查失败: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 将IP地址转换为长整型
+     */
+    private long ipToLong(String ipAddress) {
+        String[] ipParts = ipAddress.split("\\.");
+        long result = 0;
+        for (int i = 0; i < 4; i++) {
+            result = result << 8;
+            result |= Integer.parseInt(ipParts[i]);
+        }
+        return result;
     }
 }

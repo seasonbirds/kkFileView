@@ -71,6 +71,7 @@ public class ConfigConstants {
     private static int pdfTimeout80;
     private static int pdfTimeout200;
     private static int pdfThread;
+    private static String ipWhitelist;
 
     public static final String DEFAULT_CACHE_ENABLED = "true";
     public static final String DEFAULT_TXT_TYPE = "txt,html,htm,asp,jsp,xml,json,properties,md,gitignore,log,java,py,c,cpp,sql,sh,bat,m,bas,prg,cmd,xbrl";
@@ -115,6 +116,7 @@ public class ConfigConstants {
     public static final String DEFAULT_PDF_TIMEOUT80 = "180";
     public static final String DEFAULT_PDF_TIMEOUT200 = "300";
     public static final String DEFAULT_PDF_THREAD = "5";
+    public static final String DEFAULT_IP_WHITELIST = "";
 
     public static Boolean isCacheEnabled() {
         return cacheEnabled;
@@ -811,6 +813,19 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
+    }
+
+    public static String getIpWhitelist() {
+        return ipWhitelist;
+    }
+
+    @Value("${ip.whitelist:}")
+    public void setIpWhitelist(String ipWhitelist) {
+        setIpWhitelistValue(ipWhitelist);
+    }
+
+    public static void setIpWhitelistValue(String ipWhitelist) {
+        ConfigConstants.ipWhitelist = ipWhitelist;
     }
 
 }
