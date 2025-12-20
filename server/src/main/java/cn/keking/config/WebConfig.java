@@ -1,6 +1,7 @@
 package cn.keking.config;
 
 import cn.keking.web.filter.*;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -95,6 +96,20 @@ public class WebConfig implements WebMvcConfigurer {
         filterUri.add("/picturesPreview");
         AttributeSetFilter filter = new AttributeSetFilter();
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<SSOFilter> getSSOFilter(@Qualifier("ssoRedissonClient") RedissonClient redissonClient) {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        filterUri.add("/picturesPreview");
+        filterUri.add("/getCorsFile");
+        SSOFilter filter = new SSOFilter();
+        filter.setRedissonClient(redissonClient);
+        FilterRegistrationBean<SSOFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
         return registrationBean;
