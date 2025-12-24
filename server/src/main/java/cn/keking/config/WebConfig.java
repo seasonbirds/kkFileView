@@ -1,6 +1,7 @@
 package cn.keking.config;
 
 import cn.keking.web.filter.*;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -20,6 +21,14 @@ import java.util.Set;
 public class WebConfig implements WebMvcConfigurer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(WebConfig.class);
+    private final RedissonClient redissonClient;
+    private final RedissonClient ssoRedissonClient;
+
+    public WebConfig(RedissonClient redissonClient, @org.springframework.beans.factory.annotation.Qualifier("ssoRedissonClient") RedissonClient ssoRedissonClient) {
+        this.redissonClient = redissonClient;
+        this.ssoRedissonClient = ssoRedissonClient;
+    }
+
     /**
      * 访问外部文件配置
      */
@@ -97,6 +106,21 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<SSOFilter> getSSOFilter() {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        filterUri.add("/picturesPreview");
+        filterUri.add("/getCorsFile");
+        SSOFilter filter = new SSOFilter();
+        filter.setRedissonClient(ssoRedissonClient);
+        FilterRegistrationBean<SSOFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(5); // 设置比其他过滤器更高的优先级
         return registrationBean;
     }
 }
