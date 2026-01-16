@@ -10,10 +10,12 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.StopWatch;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 
 @SpringBootApplication
 @EnableScheduling
 @ComponentScan(value = "cn.keking.*")
+@ServletComponentScan
 public class ServerMain {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerMain.class);
