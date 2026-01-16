@@ -19,8 +19,6 @@ import java.util.concurrent.BlockingQueue;
  * @time: 2019/4/2 17:21
  * @description
  */
-@Service
-@ConditionalOnExpression("'${cache.type:default}'.equals('jdk')")
 public class CacheServiceJDKImpl implements CacheService {
 
     private Map<String, String> pdfCache;
@@ -140,6 +138,15 @@ public class CacheServiceJDKImpl implements CacheService {
         mediaConvertCache = new ConcurrentLinkedHashMap.Builder<String, String>()
                 .maximumWeightedCapacity(capacity).weigher(Weighers.singleton())
                 .build();
+    }
+
+    @Override
+    public void incrementPreviewCount(String fileName) {
+    }
+
+    @Override
+    public List<Map<String, Object>> getTopPreviewFiles(int limit) {
+        return new ArrayList<>();
     }
 
 }

@@ -14,6 +14,7 @@ public interface CacheService {
     String FILE_PREVIEW_PDF_IMGS_KEY = "converted-preview-pdfimgs-file";
     String FILE_PREVIEW_MEDIA_CONVERT_KEY = "converted-preview-media-file";
     String TASK_QUEUE_NAME = "convert-task";
+    String FILE_PREVIEW_RANKING_KEY = "file-preview-ranking";
 
     Integer DEFAULT_PDF_CAPACITY = 500000;
     Integer DEFAULT_IMG_CAPACITY = 500000;
@@ -38,5 +39,8 @@ public interface CacheService {
     void cleanCache();
     void addQueueTask(String url);
     String takeQueueTask() throws InterruptedException;
+    
+    void incrementPreviewCount(String fileName);
+    List<Map<String, Object>> getTopPreviewFiles(int limit);
 
 }

@@ -1,14 +1,14 @@
 package cn.keking.service.cache.impl;
 
 import cn.keking.service.cache.CacheService;
-import org.redisson.Redisson;
 import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RMapCache;
+import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,14 +17,13 @@ import java.util.Map;
  * @time: 2019/4/2 18:02
  * @description
  */
-@ConditionalOnExpression("'${cache.type:default}'.equals('redis')")
 @Service
 public class CacheServiceRedisImpl implements CacheService {
 
     private final RedissonClient redissonClient;
 
-    public CacheServiceRedisImpl(Config config) {
-        this.redissonClient = Redisson.create(config);
+    public CacheServiceRedisImpl(RedissonClient redissonClient) {
+        this.redissonClient = redissonClient;
     }
 
     @Override
@@ -120,6 +119,34 @@ public class CacheServiceRedisImpl implements CacheService {
     public String takeQueueTask() throws InterruptedException {
         RBlockingQueue<String> queue = redissonClient.getBlockingQueue(TASK_QUEUE_NAME);
         return queue.take();
+    }
+
+    @Override
+    public void incrementPreviewCount(String fileName) {
+        RScoredSortedSet<String> rankingSet = redissonClient.getScoredSortedSet(FILE_PREVIEW_RANKING_KEY);
+        rankingSet.addScoreAsync(fileName, 1);
+    }
+
+    @Override
+    public List<Map<String, Object>> getTopPreviewFiles(int limit) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        RScoredSortedSet<String> rankingSet = redissonClient.getScoredSortedSet(FILE_PREVIEW_RANKING_KEY);
+        
+        List<String> topFiles = rankingSet.valueRangeReversed(0, limit - 1);
+        
+        for (int i = 0; i < topFiles.size(); i++) {
+            String fileName = topFiles.get(i);
+            Double score = rankingSet.getScore(fileName);
+            
+            Map<String, Object> fileInfo = new HashMap<>();
+            fileInfo.put("rank", i + 1);
+            fileInfo.put("fileName", fileName);
+            fileInfo.put("previewCount", score.longValue());
+            
+            result.add(fileInfo);
+        }
+        
+        return result;
     }
 
     private void cleanPdfCache() {
