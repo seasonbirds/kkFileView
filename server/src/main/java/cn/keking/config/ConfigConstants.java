@@ -71,6 +71,12 @@ public class ConfigConstants {
     private static int pdfTimeout80;
     private static int pdfTimeout200;
     private static int pdfThread;
+    private static Boolean userMonitorEnabled;
+    private static int userMonitorPeriodMinutes;
+    private static int userMonitorPeriodThreshold;
+    private static int userMonitorDailyThreshold;
+    private static String userMonitorAdminEmail;
+    private static String userMonitorDbPath;
 
     public static final String DEFAULT_CACHE_ENABLED = "true";
     public static final String DEFAULT_TXT_TYPE = "txt,html,htm,asp,jsp,xml,json,properties,md,gitignore,log,java,py,c,cpp,sql,sh,bat,m,bas,prg,cmd,xbrl";
@@ -811,6 +817,88 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
+    }
+
+    /**
+     * 以下为用户行为监控设置
+     */
+
+    public static Boolean getUserMonitorEnabled() {
+        return userMonitorEnabled;
+    }
+
+    @Value("${user.monitor.enabled:true}")
+    public void setUserMonitorEnabled(Boolean userMonitorEnabled) {
+        setUserMonitorEnabledValue(userMonitorEnabled);
+    }
+
+    public static void setUserMonitorEnabledValue(Boolean userMonitorEnabled) {
+        ConfigConstants.userMonitorEnabled = userMonitorEnabled;
+    }
+
+    public static int getUserMonitorPeriodMinutes() {
+        return userMonitorPeriodMinutes;
+    }
+
+    @Value("${user.monitor.period.minutes:5}")
+    public void setUserMonitorPeriodMinutes(int userMonitorPeriodMinutes) {
+        setUserMonitorPeriodMinutesValue(userMonitorPeriodMinutes);
+    }
+
+    public static void setUserMonitorPeriodMinutesValue(int userMonitorPeriodMinutes) {
+        ConfigConstants.userMonitorPeriodMinutes = userMonitorPeriodMinutes;
+    }
+
+    public static int getUserMonitorPeriodThreshold() {
+        return userMonitorPeriodThreshold;
+    }
+
+    @Value("${user.monitor.period.threshold:30}")
+    public void setUserMonitorPeriodThreshold(int userMonitorPeriodThreshold) {
+        setUserMonitorPeriodThresholdValue(userMonitorPeriodThreshold);
+    }
+
+    public static void setUserMonitorPeriodThresholdValue(int userMonitorPeriodThreshold) {
+        ConfigConstants.userMonitorPeriodThreshold = userMonitorPeriodThreshold;
+    }
+
+    public static int getUserMonitorDailyThreshold() {
+        return userMonitorDailyThreshold;
+    }
+
+    @Value("${user.monitor.daily.threshold:200}")
+    public void setUserMonitorDailyThreshold(int userMonitorDailyThreshold) {
+        setUserMonitorDailyThresholdValue(userMonitorDailyThreshold);
+    }
+
+    public static void setUserMonitorDailyThresholdValue(int userMonitorDailyThreshold) {
+        ConfigConstants.userMonitorDailyThreshold = userMonitorDailyThreshold;
+    }
+
+    public static String getUserMonitorAdminEmail() {
+        return userMonitorAdminEmail;
+    }
+
+    @Value("${user.monitor.admin.email:admin@example.com}")
+    public void setUserMonitorAdminEmail(String userMonitorAdminEmail) {
+        setUserMonitorAdminEmailValue(userMonitorAdminEmail);
+    }
+
+    public static void setUserMonitorAdminEmailValue(String userMonitorAdminEmail) {
+        ConfigConstants.userMonitorAdminEmail = userMonitorAdminEmail;
+    }
+
+    public static String getUserMonitorDbPath() {
+        return userMonitorDbPath;
+    }
+
+    @Value("${user.monitor.db.path:./data/user_monitor.db}")
+    public void setUserMonitorDbPath(String userMonitorDbPath) {
+        setUserMonitorDbPathValue(userMonitorDbPath);
+    }
+
+    public static void setUserMonitorDbPathValue(String userMonitorDbPath) {
+        ConfigConstants.userMonitorDbPath = userMonitorDbPath;
     }
 
 }

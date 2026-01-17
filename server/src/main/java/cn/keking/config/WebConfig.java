@@ -1,8 +1,12 @@
 package cn.keking.config;
 
+import cn.keking.service.UserAccessCountService;
+import cn.keking.service.AlertEmailService;
+import cn.keking.service.UserAccessLogService;
 import cn.keking.web.filter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +24,15 @@ import java.util.Set;
 public class WebConfig implements WebMvcConfigurer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(WebConfig.class);
+
+    @Autowired
+    private UserAccessCountService userAccessCountService;
+
+    @Autowired
+    private AlertEmailService alertEmailService;
+
+    @Autowired
+    private UserAccessLogService userAccessLogService;
     /**
      * 访问外部文件配置
      */
@@ -97,6 +110,20 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<UserAccessMonitorFilter> getUserAccessMonitorFilter() {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        filterUri.add("/picturesPreview");
+        filterUri.add("/getCorsFile");
+        UserAccessMonitorFilter filter = new UserAccessMonitorFilter(userAccessCountService, alertEmailService, userAccessLogService);
+        FilterRegistrationBean<UserAccessMonitorFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(5);
         return registrationBean;
     }
 }
