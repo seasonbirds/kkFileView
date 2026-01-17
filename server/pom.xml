@@ -50,6 +50,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-freemarker</artifactId>
         </dependency>
+
+        <!-- email -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
@@ -219,6 +225,20 @@
             <groupId>io.mola.galimatias</groupId>
             <artifactId>galimatias</artifactId>
             <version>${galimatias.version}</version>
+        </dependency>
+
+        <!-- SQLite JDBC驱动 -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.50.2.0</version>
+        </dependency>
+
+        <!-- Redis客户端 - Jedis -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>5.1.0</version>
         </dependency>
 
         <!-- 以下是bytedeco 基于opencv ffmpeg封装的javacv，用于视频处理 -->
