@@ -813,4 +813,220 @@ public class ConfigConstants {
         ConfigConstants.homeSearch = homeSearch;
     }
 
+    /**
+     * 以下为用户行为分析设置
+     */
+
+    private static Boolean userBehaviorAnalysisEnabled;
+    private static int userBehaviorAnalysisPeriodMinutes;
+    private static int userBehaviorAnalysisThresholdPerPeriod;
+    private static int userBehaviorAnalysisDailyThreshold;
+    private static String userBehaviorAnalysisSmtpHost;
+    private static int userBehaviorAnalysisSmtpPort;
+    private static String userBehaviorAnalysisSmtpUsername;
+    private static String userBehaviorAnalysisSmtpPassword;
+    private static String userBehaviorAnalysisSmtpFrom;
+    private static String userBehaviorAnalysisSmtpTo;
+    private static String userBehaviorAnalysisRedisHost;
+    private static int userBehaviorAnalysisRedisPort;
+    private static String userBehaviorAnalysisRedisPassword;
+    private static int userBehaviorAnalysisRedisDatabase;
+
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_ENABLED = "false";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_PERIOD_MINUTES = "5";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_THRESHOLD_PER_PERIOD = "100";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_DAILY_THRESHOLD = "1000";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_SMTP_HOST = "";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_SMTP_PORT = "587";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_SMTP_USERNAME = "";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_SMTP_PASSWORD = "";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_SMTP_FROM = "";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_SMTP_TO = "";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_REDIS_HOST = "localhost";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_REDIS_PORT = "6379";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_REDIS_PASSWORD = "";
+    public static final String DEFAULT_USER_BEHAVIOR_ANALYSIS_REDIS_DATABASE = "0";
+
+    public static Boolean isUserBehaviorAnalysisEnabled() {
+        return userBehaviorAnalysisEnabled;
+    }
+
+    @Value("${user.behavior.analysis.enabled:false}")
+    public void setUserBehaviorAnalysisEnabled(String userBehaviorAnalysisEnabled) {
+        setUserBehaviorAnalysisEnabledValue(Boolean.parseBoolean(userBehaviorAnalysisEnabled));
+    }
+
+    public static void setUserBehaviorAnalysisEnabledValue(Boolean userBehaviorAnalysisEnabled) {
+        ConfigConstants.userBehaviorAnalysisEnabled = userBehaviorAnalysisEnabled;
+    }
+
+    public static int getUserBehaviorAnalysisPeriodMinutes() {
+        return userBehaviorAnalysisPeriodMinutes;
+    }
+
+    @Value("${user.behavior.analysis.period.minutes:5}")
+    public void setUserBehaviorAnalysisPeriodMinutes(int userBehaviorAnalysisPeriodMinutes) {
+        setUserBehaviorAnalysisPeriodMinutesValue(userBehaviorAnalysisPeriodMinutes);
+    }
+
+    public static void setUserBehaviorAnalysisPeriodMinutesValue(int userBehaviorAnalysisPeriodMinutes) {
+        ConfigConstants.userBehaviorAnalysisPeriodMinutes = userBehaviorAnalysisPeriodMinutes;
+    }
+
+    public static int getUserBehaviorAnalysisThresholdPerPeriod() {
+        return userBehaviorAnalysisThresholdPerPeriod;
+    }
+
+    @Value("${user.behavior.analysis.threshold.per.period:100}")
+    public void setUserBehaviorAnalysisThresholdPerPeriod(int userBehaviorAnalysisThresholdPerPeriod) {
+        setUserBehaviorAnalysisThresholdPerPeriodValue(userBehaviorAnalysisThresholdPerPeriod);
+    }
+
+    public static void setUserBehaviorAnalysisThresholdPerPeriodValue(int userBehaviorAnalysisThresholdPerPeriod) {
+        ConfigConstants.userBehaviorAnalysisThresholdPerPeriod = userBehaviorAnalysisThresholdPerPeriod;
+    }
+
+    public static int getUserBehaviorAnalysisDailyThreshold() {
+        return userBehaviorAnalysisDailyThreshold;
+    }
+
+    @Value("${user.behavior.analysis.daily.threshold:1000}")
+    public void setUserBehaviorAnalysisDailyThreshold(int userBehaviorAnalysisDailyThreshold) {
+        setUserBehaviorAnalysisDailyThresholdValue(userBehaviorAnalysisDailyThreshold);
+    }
+
+    public static void setUserBehaviorAnalysisDailyThresholdValue(int userBehaviorAnalysisDailyThreshold) {
+        ConfigConstants.userBehaviorAnalysisDailyThreshold = userBehaviorAnalysisDailyThreshold;
+    }
+
+    public static String getUserBehaviorAnalysisSmtpHost() {
+        return userBehaviorAnalysisSmtpHost;
+    }
+
+    @Value("${user.behavior.analysis.smtp.host:}")
+    public void setUserBehaviorAnalysisSmtpHost(String userBehaviorAnalysisSmtpHost) {
+        setUserBehaviorAnalysisSmtpHostValue(userBehaviorAnalysisSmtpHost);
+    }
+
+    public static void setUserBehaviorAnalysisSmtpHostValue(String userBehaviorAnalysisSmtpHost) {
+        ConfigConstants.userBehaviorAnalysisSmtpHost = userBehaviorAnalysisSmtpHost;
+    }
+
+    public static int getUserBehaviorAnalysisSmtpPort() {
+        return userBehaviorAnalysisSmtpPort;
+    }
+
+    @Value("${user.behavior.analysis.smtp.port:587}")
+    public void setUserBehaviorAnalysisSmtpPort(int userBehaviorAnalysisSmtpPort) {
+        setUserBehaviorAnalysisSmtpPortValue(userBehaviorAnalysisSmtpPort);
+    }
+
+    public static void setUserBehaviorAnalysisSmtpPortValue(int userBehaviorAnalysisSmtpPort) {
+        ConfigConstants.userBehaviorAnalysisSmtpPort = userBehaviorAnalysisSmtpPort;
+    }
+
+    public static String getUserBehaviorAnalysisSmtpUsername() {
+        return userBehaviorAnalysisSmtpUsername;
+    }
+
+    @Value("${user.behavior.analysis.smtp.username:}")
+    public void setUserBehaviorAnalysisSmtpUsername(String userBehaviorAnalysisSmtpUsername) {
+        setUserBehaviorAnalysisSmtpUsernameValue(userBehaviorAnalysisSmtpUsername);
+    }
+
+    public static void setUserBehaviorAnalysisSmtpUsernameValue(String userBehaviorAnalysisSmtpUsername) {
+        ConfigConstants.userBehaviorAnalysisSmtpUsername = userBehaviorAnalysisSmtpUsername;
+    }
+
+    public static String getUserBehaviorAnalysisSmtpPassword() {
+        return userBehaviorAnalysisSmtpPassword;
+    }
+
+    @Value("${user.behavior.analysis.smtp.password:}")
+    public void setUserBehaviorAnalysisSmtpPassword(String userBehaviorAnalysisSmtpPassword) {
+        setUserBehaviorAnalysisSmtpPasswordValue(userBehaviorAnalysisSmtpPassword);
+    }
+
+    public static void setUserBehaviorAnalysisSmtpPasswordValue(String userBehaviorAnalysisSmtpPassword) {
+        ConfigConstants.userBehaviorAnalysisSmtpPassword = userBehaviorAnalysisSmtpPassword;
+    }
+
+    public static String getUserBehaviorAnalysisSmtpFrom() {
+        return userBehaviorAnalysisSmtpFrom;
+    }
+
+    @Value("${user.behavior.analysis.smtp.from:}")
+    public void setUserBehaviorAnalysisSmtpFrom(String userBehaviorAnalysisSmtpFrom) {
+        setUserBehaviorAnalysisSmtpFromValue(userBehaviorAnalysisSmtpFrom);
+    }
+
+    public static void setUserBehaviorAnalysisSmtpFromValue(String userBehaviorAnalysisSmtpFrom) {
+        ConfigConstants.userBehaviorAnalysisSmtpFrom = userBehaviorAnalysisSmtpFrom;
+    }
+
+    public static String getUserBehaviorAnalysisSmtpTo() {
+        return userBehaviorAnalysisSmtpTo;
+    }
+
+    @Value("${user.behavior.analysis.smtp.to:}")
+    public void setUserBehaviorAnalysisSmtpTo(String userBehaviorAnalysisSmtpTo) {
+        setUserBehaviorAnalysisSmtpToValue(userBehaviorAnalysisSmtpTo);
+    }
+
+    public static void setUserBehaviorAnalysisSmtpToValue(String userBehaviorAnalysisSmtpTo) {
+        ConfigConstants.userBehaviorAnalysisSmtpTo = userBehaviorAnalysisSmtpTo;
+    }
+
+    public static String getUserBehaviorAnalysisRedisHost() {
+        return userBehaviorAnalysisRedisHost;
+    }
+
+    @Value("${user.behavior.analysis.redis.host:localhost}")
+    public void setUserBehaviorAnalysisRedisHost(String userBehaviorAnalysisRedisHost) {
+        setUserBehaviorAnalysisRedisHostValue(userBehaviorAnalysisRedisHost);
+    }
+
+    public static void setUserBehaviorAnalysisRedisHostValue(String userBehaviorAnalysisRedisHost) {
+        ConfigConstants.userBehaviorAnalysisRedisHost = userBehaviorAnalysisRedisHost;
+    }
+
+    public static int getUserBehaviorAnalysisRedisPort() {
+        return userBehaviorAnalysisRedisPort;
+    }
+
+    @Value("${user.behavior.analysis.redis.port:6379}")
+    public void setUserBehaviorAnalysisRedisPort(int userBehaviorAnalysisRedisPort) {
+        setUserBehaviorAnalysisRedisPortValue(userBehaviorAnalysisRedisPort);
+    }
+
+    public static void setUserBehaviorAnalysisRedisPortValue(int userBehaviorAnalysisRedisPort) {
+        ConfigConstants.userBehaviorAnalysisRedisPort = userBehaviorAnalysisRedisPort;
+    }
+
+    public static String getUserBehaviorAnalysisRedisPassword() {
+        return userBehaviorAnalysisRedisPassword;
+    }
+
+    @Value("${user.behavior.analysis.redis.password:}")
+    public void setUserBehaviorAnalysisRedisPassword(String userBehaviorAnalysisRedisPassword) {
+        setUserBehaviorAnalysisRedisPasswordValue(userBehaviorAnalysisRedisPassword);
+    }
+
+    public static void setUserBehaviorAnalysisRedisPasswordValue(String userBehaviorAnalysisRedisPassword) {
+        ConfigConstants.userBehaviorAnalysisRedisPassword = userBehaviorAnalysisRedisPassword;
+    }
+
+    public static int getUserBehaviorAnalysisRedisDatabase() {
+        return userBehaviorAnalysisRedisDatabase;
+    }
+
+    @Value("${user.behavior.analysis.redis.database:0}")
+    public void setUserBehaviorAnalysisRedisDatabase(int userBehaviorAnalysisRedisDatabase) {
+        setUserBehaviorAnalysisRedisDatabaseValue(userBehaviorAnalysisRedisDatabase);
+    }
+
+    public static void setUserBehaviorAnalysisRedisDatabaseValue(int userBehaviorAnalysisRedisDatabase) {
+        ConfigConstants.userBehaviorAnalysisRedisDatabase = userBehaviorAnalysisRedisDatabase;
+    }
+
 }
