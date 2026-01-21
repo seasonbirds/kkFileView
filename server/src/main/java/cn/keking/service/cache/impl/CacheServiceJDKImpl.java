@@ -9,10 +9,13 @@ import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
 
 /**
  * @auther: chenjh
@@ -27,6 +30,7 @@ public class CacheServiceJDKImpl implements CacheService {
     private Map<String, List<String>> imgCache;
     private Map<String, Integer> pdfImagesCache;
     private Map<String, String> mediaConvertCache;
+    private Map<String, Long> filePreviewCountCache;
     private static final int QUEUE_SIZE = 500000;
     private final BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(QUEUE_SIZE);
 
@@ -36,6 +40,13 @@ public class CacheServiceJDKImpl implements CacheService {
         initIMGCachePool(CacheService.DEFAULT_IMG_CAPACITY);
         initPdfImagesCachePool(CacheService.DEFAULT_PDFIMG_CAPACITY);
         initMediaConvertCachePool(CacheService.DEFAULT_MEDIACONVERT_CAPACITY);
+        initFilePreviewCountCachePool(CacheService.DEFAULT_PDF_CAPACITY);
+    }
+
+    private void initFilePreviewCountCachePool(Integer capacity) {
+        filePreviewCountCache = new ConcurrentLinkedHashMap.Builder<String, Long>()
+                .maximumWeightedCapacity(capacity).weigher(Weighers.singleton())
+                .build();
     }
 
     @Override
@@ -140,6 +151,36 @@ public class CacheServiceJDKImpl implements CacheService {
         mediaConvertCache = new ConcurrentLinkedHashMap.Builder<String, String>()
                 .maximumWeightedCapacity(capacity).weigher(Weighers.singleton())
                 .build();
+    }
+
+    @Override
+    public void incrementFilePreviewCount(String fileName) {
+        filePreviewCountCache.compute(fileName, (k, v) -> v == null ? 1 : v + 1);
+    }
+
+    @Override
+    public long getFilePreviewCount(String fileName) {
+        Long count = filePreviewCountCache.get(fileName);
+        return count != null ? count : 0;
+    }
+
+    @Override
+    public List<Map<String, Object>> getFilePreviewRank(int topN) {
+        List<Map<String, Object>> rankList = new ArrayList<>();
+        List<Map.Entry<String, Long>> sortedEntries = filePreviewCountCache.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .limit(topN)
+                .collect(Collectors.toList());
+        
+        int rank = 1;
+        for (Map.Entry<String, Long> entry : sortedEntries) {
+            Map<String, Object> fileInfo = new HashMap<>();
+            fileInfo.put("rank", rank++);
+            fileInfo.put("fileName", entry.getKey());
+            fileInfo.put("count", entry.getValue());
+            rankList.add(fileInfo);
+        }
+        return rankList;
     }
 
 }

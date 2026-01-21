@@ -11,11 +11,13 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
 
 /**
  * @auther: chenjh
@@ -51,6 +53,10 @@ public class CacheServiceRocksDBImpl implements CacheService {
             if (db.get(FILE_PREVIEW_PDF_IMGS_KEY.getBytes()) == null) {
                 Map<String, Integer> initPDFIMGCache = new HashMap<>();
                 db.put(FILE_PREVIEW_PDF_IMGS_KEY.getBytes(), toByteArray(initPDFIMGCache));
+            }
+            if (db.get(FILE_PREVIEW_COUNT_KEY.getBytes()) == null) {
+                Map<String, Long> initFilePreviewCountCache = new HashMap<>();
+                db.put(FILE_PREVIEW_COUNT_KEY.getBytes(), toByteArray(initFilePreviewCountCache));
             }
         } catch (RocksDBException | IOException e) {
             LOGGER.error("Uable to init RocksDB" + e);
@@ -286,5 +292,63 @@ public class CacheServiceRocksDBImpl implements CacheService {
     private void cleanMediaConvertCache() throws IOException, RocksDBException {
         Map<String, String> initMediaConvertCache = new HashMap<>();
         db.put(FILE_PREVIEW_MEDIA_CONVERT_KEY.getBytes(), toByteArray(initMediaConvertCache));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Long> getFilePreviewCountCache() {
+        Map<String, Long> map = new HashMap<>();
+        try {
+            map = (Map<String, Long>) toObject(db.get(FILE_PREVIEW_COUNT_KEY.getBytes()));
+        } catch (RocksDBException | IOException | ClassNotFoundException e) {
+            LOGGER.error("Get from RocksDB Exception" + e);
+        }
+        return map;
+    }
+
+    @Override
+    public void incrementFilePreviewCount(String fileName) {
+        try {
+            Map<String, Long> filePreviewCountCache = getFilePreviewCountCache();
+            filePreviewCountCache.compute(fileName, (k, v) -> v == null ? 1 : v + 1);
+            db.put(FILE_PREVIEW_COUNT_KEY.getBytes(), toByteArray(filePreviewCountCache));
+        } catch (RocksDBException | IOException e) {
+            LOGGER.error("Put into RocksDB Exception" + e);
+        }
+    }
+
+    @Override
+    public long getFilePreviewCount(String fileName) {
+        Long result = 0L;
+        try {
+            Map<String, Long> map = (Map<String, Long>) toObject(db.get(FILE_PREVIEW_COUNT_KEY.getBytes()));
+            result = map.get(fileName);
+        } catch (RocksDBException | IOException | ClassNotFoundException e) {
+            LOGGER.error("Get from RocksDB Exception" + e);
+        }
+        return result != null ? result : 0;
+    }
+
+    @Override
+    public List<Map<String, Object>> getFilePreviewRank(int topN) {
+        List<Map<String, Object>> rankList = new ArrayList<>();
+        try {
+            Map<String, Long> filePreviewCountCache = getFilePreviewCountCache();
+            List<Map.Entry<String, Long>> sortedEntries = filePreviewCountCache.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .limit(topN)
+                    .collect(Collectors.toList());
+            
+            int rank = 1;
+            for (Map.Entry<String, Long> entry : sortedEntries) {
+                Map<String, Object> fileInfo = new HashMap<>();
+                fileInfo.put("rank", rank++);
+                fileInfo.put("fileName", entry.getKey());
+                fileInfo.put("count", entry.getValue());
+                rankList.add(fileInfo);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Get file preview rank exception" + e);
+        }
+        return rankList;
     }
 }

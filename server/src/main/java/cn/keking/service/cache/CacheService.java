@@ -39,4 +39,10 @@ public interface CacheService {
     void addQueueTask(String url);
     String takeQueueTask() throws InterruptedException;
 
+    // 文件预览次数统计相关方法
+    String FILE_PREVIEW_COUNT_KEY = "file-preview-count";
+    void incrementFilePreviewCount(String fileName);
+    long getFilePreviewCount(String fileName);
+    List<Map<String, Object>> getFilePreviewRank(int topN);
+
 }
