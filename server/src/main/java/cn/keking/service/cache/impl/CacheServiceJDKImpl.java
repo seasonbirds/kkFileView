@@ -141,5 +141,4 @@ public class CacheServiceJDKImpl implements CacheService {
                 .maximumWeightedCapacity(capacity).weigher(Weighers.singleton())
                 .build();
     }
-
 }

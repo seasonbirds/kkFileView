@@ -1,7 +1,12 @@
 package cn.keking.web.controller;
 
+import cn.keking.service.RankService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.Map;
 
 /**
  *  页面跳转
@@ -10,6 +15,12 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Controller
 public class IndexController {
+
+    private final RankService rankService;
+
+    public IndexController(RankService rankService) {
+        this.rankService = rankService;
+    }
 
     @GetMapping( "/index")
     public String go2Index(){
@@ -36,5 +47,15 @@ public class IndexController {
         return "/main/index";
     }
 
+    @GetMapping( "/popular-files")
+    public String go2PopularFiles(){
+        return "/main/popular-files";
+    }
+
+    @GetMapping( "/api/popular-files")
+    @ResponseBody
+    public Map<String, Long> getPopularFiles(@RequestParam(defaultValue = "10") int topN){
+        return rankService.getFilePreviewTop(topN);
+    }
 
 }
