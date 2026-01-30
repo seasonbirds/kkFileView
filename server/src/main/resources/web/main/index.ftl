@@ -71,6 +71,7 @@
             <li><a href="./integrated">接入说明</a></li>
             <li><a href="./record">版本发布记录</a></li>
             <li><a href="./sponsor">赞助开源</a></li>
+            <li><a href="./ranking">预览排行榜</a></li>
         </ul>
     </div>
 </nav>

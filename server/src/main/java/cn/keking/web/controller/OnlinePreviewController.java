@@ -81,6 +81,7 @@ public class OnlinePreviewController {
         if (ObjectUtils.isEmpty(fileUrl)) {
             return otherFilePreview.notSupportedFile(model, "非法路径,不允许访问");
         }
+        
         return filePreview.filePreviewHandle(fileUrl, model, fileAttribute);  //统一在这里处理 url
     }
 

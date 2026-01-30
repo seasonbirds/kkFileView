@@ -31,6 +31,11 @@ public class IndexController {
         return "/main/integrated";
     }
 
+    @GetMapping( "/ranking")
+    public String go2Ranking(){
+        return "/main/ranking";
+    }
+
     @GetMapping( "/")
     public String root() {
         return "/main/index";
