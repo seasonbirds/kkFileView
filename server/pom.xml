@@ -122,6 +122,25 @@
             <version>${redisson.version}</version>
         </dependency>
 
+        <!-- SQLite for user behavior tracking -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.45.1.0</version>
+        </dependency>
+
+        <!-- Spring Data JPA for SQLite -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Mail support for alerts -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- 编码检测-JUniversalCharDet-->
         <dependency>
             <groupId>com.googlecode.juniversalchardet</groupId>
