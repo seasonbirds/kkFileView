@@ -813,4 +813,138 @@ public class ConfigConstants {
         ConfigConstants.homeSearch = homeSearch;
     }
 
+    private static Boolean userBehaviorMonitorEnabled;
+    private static Integer userBehaviorStatisticsPeriodMinutes;
+    private static Integer userBehaviorStatisticsMaxRequests;
+    private static Integer userBehaviorDailyMaxRequests;
+    private static String userBehaviorDbPath;
+    private static Boolean userBehaviorAlertEmailEnabled;
+    private static String userBehaviorAlertEmailReceiver;
+    private static String userBehaviorAlertEmailSenderName;
+    private static String mailUsername;
+
+    public static final String DEFAULT_USER_BEHAVIOR_MONITOR_ENABLED = "true";
+    public static final String DEFAULT_USER_BEHAVIOR_STATISTICS_PERIOD_MINUTES = "10";
+    public static final String DEFAULT_USER_BEHAVIOR_STATISTICS_MAX_REQUESTS = "30";
+    public static final String DEFAULT_USER_BEHAVIOR_DAILY_MAX_REQUESTS = "200";
+    public static final String DEFAULT_USER_BEHAVIOR_DB_PATH = "default";
+    public static final String DEFAULT_USER_BEHAVIOR_ALERT_EMAIL_ENABLED = "false";
+
+    public static Boolean isUserBehaviorMonitorEnabled() {
+        return userBehaviorMonitorEnabled;
+    }
+
+    @Value("${user.behavior.monitor.enabled:true}")
+    public void setUserBehaviorMonitorEnabled(String userBehaviorMonitorEnabled) {
+        setUserBehaviorMonitorEnabledValue(Boolean.parseBoolean(userBehaviorMonitorEnabled));
+    }
+
+    public static void setUserBehaviorMonitorEnabledValue(Boolean userBehaviorMonitorEnabled) {
+        ConfigConstants.userBehaviorMonitorEnabled = userBehaviorMonitorEnabled;
+    }
+
+    public static Integer getUserBehaviorStatisticsPeriodMinutes() {
+        return userBehaviorStatisticsPeriodMinutes;
+    }
+
+    @Value("${user.behavior.statistics.period.minutes:10}")
+    public void setUserBehaviorStatisticsPeriodMinutes(Integer userBehaviorStatisticsPeriodMinutes) {
+        setUserBehaviorStatisticsPeriodMinutesValue(userBehaviorStatisticsPeriodMinutes);
+    }
+
+    public static void setUserBehaviorStatisticsPeriodMinutesValue(Integer userBehaviorStatisticsPeriodMinutes) {
+        ConfigConstants.userBehaviorStatisticsPeriodMinutes = userBehaviorStatisticsPeriodMinutes;
+    }
+
+    public static Integer getUserBehaviorStatisticsMaxRequests() {
+        return userBehaviorStatisticsMaxRequests;
+    }
+
+    @Value("${user.behavior.statistics.max.requests:30}")
+    public void setUserBehaviorStatisticsMaxRequests(Integer userBehaviorStatisticsMaxRequests) {
+        setUserBehaviorStatisticsMaxRequestsValue(userBehaviorStatisticsMaxRequests);
+    }
+
+    public static void setUserBehaviorStatisticsMaxRequestsValue(Integer userBehaviorStatisticsMaxRequests) {
+        ConfigConstants.userBehaviorStatisticsMaxRequests = userBehaviorStatisticsMaxRequests;
+    }
+
+    public static Integer getUserBehaviorDailyMaxRequests() {
+        return userBehaviorDailyMaxRequests;
+    }
+
+    @Value("${user.behavior.daily.max.requests:200}")
+    public void setUserBehaviorDailyMaxRequests(Integer userBehaviorDailyMaxRequests) {
+        setUserBehaviorDailyMaxRequestsValue(userBehaviorDailyMaxRequests);
+    }
+
+    public static void setUserBehaviorDailyMaxRequestsValue(Integer userBehaviorDailyMaxRequests) {
+        ConfigConstants.userBehaviorDailyMaxRequests = userBehaviorDailyMaxRequests;
+    }
+
+    public static String getUserBehaviorDbPath() {
+        return userBehaviorDbPath;
+    }
+
+    @Value("${user.behavior.db.path:default}")
+    public void setUserBehaviorDbPath(String userBehaviorDbPath) {
+        setUserBehaviorDbPathValue(userBehaviorDbPath);
+    }
+
+    public static void setUserBehaviorDbPathValue(String userBehaviorDbPath) {
+        ConfigConstants.userBehaviorDbPath = userBehaviorDbPath;
+    }
+
+    public static Boolean isUserBehaviorAlertEmailEnabled() {
+        return userBehaviorAlertEmailEnabled;
+    }
+
+    @Value("${user.behavior.alert.email.enabled:false}")
+    public void setUserBehaviorAlertEmailEnabled(String userBehaviorAlertEmailEnabled) {
+        setUserBehaviorAlertEmailEnabledValue(Boolean.parseBoolean(userBehaviorAlertEmailEnabled));
+    }
+
+    public static void setUserBehaviorAlertEmailEnabledValue(Boolean userBehaviorAlertEmailEnabled) {
+        ConfigConstants.userBehaviorAlertEmailEnabled = userBehaviorAlertEmailEnabled;
+    }
+
+    public static String getUserBehaviorAlertEmailReceiver() {
+        return userBehaviorAlertEmailReceiver;
+    }
+
+    @Value("${user.behavior.alert.email.receiver:}")
+    public void setUserBehaviorAlertEmailReceiver(String userBehaviorAlertEmailReceiver) {
+        setUserBehaviorAlertEmailReceiverValue(userBehaviorAlertEmailReceiver);
+    }
+
+    public static void setUserBehaviorAlertEmailReceiverValue(String userBehaviorAlertEmailReceiver) {
+        ConfigConstants.userBehaviorAlertEmailReceiver = userBehaviorAlertEmailReceiver;
+    }
+
+    public static String getUserBehaviorAlertEmailSenderName() {
+        return userBehaviorAlertEmailSenderName;
+    }
+
+    @Value("${user.behavior.alert.email.sender.name:kkFileView系统}")
+    public void setUserBehaviorAlertEmailSenderName(String userBehaviorAlertEmailSenderName) {
+        setUserBehaviorAlertEmailSenderNameValue(userBehaviorAlertEmailSenderName);
+    }
+
+    public static void setUserBehaviorAlertEmailSenderNameValue(String userBehaviorAlertEmailSenderName) {
+        ConfigConstants.userBehaviorAlertEmailSenderName = userBehaviorAlertEmailSenderName;
+    }
+
+    public static String getMailUsername() {
+        return mailUsername;
+    }
+
+    @Value("${spring.mail.username:}")
+    public void setMailUsername(String mailUsername) {
+        setMailUsernameValue(mailUsername);
+    }
+
+    public static void setMailUsernameValue(String mailUsername) {
+        ConfigConstants.mailUsername = mailUsername;
+    }
+
 }
