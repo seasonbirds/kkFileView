@@ -71,6 +71,25 @@ public class ConfigConstants {
     private static int pdfTimeout80;
     private static int pdfTimeout200;
     private static int pdfThread;
+    
+    // 用户行为监控相关配置
+    private static Boolean userBehaviorMonitorEnabled;
+    private static int timeWindowMinutes;
+    private static int timeWindowThreshold;
+    private static int dailyAccessThreshold;
+    private static int behaviorRecordRetentionDays;
+    
+    // 邮件告警相关配置
+    private static Boolean alertEmailEnabled;
+    private static String mailHost;
+    private static int mailPort;
+    private static String mailUsername;
+    private static String mailPassword;
+    private static Boolean mailSmtpAuth;
+    private static Boolean mailStarttlsEnable;
+    private static Boolean mailSslEnable;
+    private static String mailFrom;
+    private static String alertEmailTo;
 
     public static final String DEFAULT_CACHE_ENABLED = "true";
     public static final String DEFAULT_TXT_TYPE = "txt,html,htm,asp,jsp,xml,json,properties,md,gitignore,log,java,py,c,cpp,sql,sh,bat,m,bas,prg,cmd,xbrl";
@@ -115,6 +134,25 @@ public class ConfigConstants {
     public static final String DEFAULT_PDF_TIMEOUT80 = "180";
     public static final String DEFAULT_PDF_TIMEOUT200 = "300";
     public static final String DEFAULT_PDF_THREAD = "5";
+    
+    // 用户行为监控相关默认值
+    public static final String DEFAULT_USER_BEHAVIOR_MONITOR_ENABLED = "true";
+    public static final String DEFAULT_TIME_WINDOW_MINUTES = "5";
+    public static final String DEFAULT_TIME_WINDOW_THRESHOLD = "30";
+    public static final String DEFAULT_DAILY_ACCESS_THRESHOLD = "500";
+    public static final String DEFAULT_BEHAVIOR_RECORD_RETENTION_DAYS = "30";
+    
+    // 邮件告警相关默认值
+    public static final String DEFAULT_ALERT_EMAIL_ENABLED = "false";
+    public static final String DEFAULT_MAIL_HOST = "smtp.example.com";
+    public static final String DEFAULT_MAIL_PORT = "587";
+    public static final String DEFAULT_MAIL_USERNAME = "";
+    public static final String DEFAULT_MAIL_PASSWORD = "";
+    public static final String DEFAULT_MAIL_SMTP_AUTH = "true";
+    public static final String DEFAULT_MAIL_STARTTLS_ENABLE = "true";
+    public static final String DEFAULT_MAIL_SSL_ENABLE = "false";
+    public static final String DEFAULT_MAIL_FROM = "noreply@example.com";
+    public static final String DEFAULT_ALERT_EMAIL_TO = "admin@example.com";
 
     public static Boolean isCacheEnabled() {
         return cacheEnabled;
@@ -811,6 +849,205 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
+    }
+
+    // ==================== 用户行为监控相关getter和setter ====================
+    
+    public static Boolean isUserBehaviorMonitorEnabled() {
+        return userBehaviorMonitorEnabled;
+    }
+
+    @Value("${user.behavior.monitor.enabled:true}")
+    public void setUserBehaviorMonitorEnabled(String userBehaviorMonitorEnabled) {
+        setUserBehaviorMonitorEnabledValue(Boolean.parseBoolean(userBehaviorMonitorEnabled));
+    }
+
+    public static void setUserBehaviorMonitorEnabledValue(Boolean userBehaviorMonitorEnabled) {
+        ConfigConstants.userBehaviorMonitorEnabled = userBehaviorMonitorEnabled;
+    }
+
+    public static int getTimeWindowMinutes() {
+        return timeWindowMinutes;
+    }
+
+    @Value("${user.behavior.time.window.minutes:5}")
+    public void setTimeWindowMinutes(String timeWindowMinutes) {
+        setTimeWindowMinutesValue(Integer.parseInt(timeWindowMinutes));
+    }
+
+    public static void setTimeWindowMinutesValue(int timeWindowMinutes) {
+        ConfigConstants.timeWindowMinutes = timeWindowMinutes;
+    }
+
+    public static int getTimeWindowThreshold() {
+        return timeWindowThreshold;
+    }
+
+    @Value("${user.behavior.time.window.threshold:30}")
+    public void setTimeWindowThreshold(String timeWindowThreshold) {
+        setTimeWindowThresholdValue(Integer.parseInt(timeWindowThreshold));
+    }
+
+    public static void setTimeWindowThresholdValue(int timeWindowThreshold) {
+        ConfigConstants.timeWindowThreshold = timeWindowThreshold;
+    }
+
+    public static int getDailyAccessThreshold() {
+        return dailyAccessThreshold;
+    }
+
+    @Value("${user.behavior.daily.access.threshold:500}")
+    public void setDailyAccessThreshold(String dailyAccessThreshold) {
+        setDailyAccessThresholdValue(Integer.parseInt(dailyAccessThreshold));
+    }
+
+    public static void setDailyAccessThresholdValue(int dailyAccessThreshold) {
+        ConfigConstants.dailyAccessThreshold = dailyAccessThreshold;
+    }
+
+    public static int getBehaviorRecordRetentionDays() {
+        return behaviorRecordRetentionDays;
+    }
+
+    @Value("${user.behavior.record.retention.days:30}")
+    public void setBehaviorRecordRetentionDays(String behaviorRecordRetentionDays) {
+        setBehaviorRecordRetentionDaysValue(Integer.parseInt(behaviorRecordRetentionDays));
+    }
+
+    public static void setBehaviorRecordRetentionDaysValue(int behaviorRecordRetentionDays) {
+        ConfigConstants.behaviorRecordRetentionDays = behaviorRecordRetentionDays;
+    }
+
+    // ==================== 邮件告警相关getter和setter ====================
+    
+    public static Boolean isAlertEmailEnabled() {
+        return alertEmailEnabled;
+    }
+
+    @Value("${alert.email.enabled:false}")
+    public void setAlertEmailEnabled(String alertEmailEnabled) {
+        setAlertEmailEnabledValue(Boolean.parseBoolean(alertEmailEnabled));
+    }
+
+    public static void setAlertEmailEnabledValue(Boolean alertEmailEnabled) {
+        ConfigConstants.alertEmailEnabled = alertEmailEnabled;
+    }
+
+    public static String getMailHost() {
+        return mailHost;
+    }
+
+    @Value("${mail.host:smtp.example.com}")
+    public void setMailHost(String mailHost) {
+        setMailHostValue(mailHost);
+    }
+
+    public static void setMailHostValue(String mailHost) {
+        ConfigConstants.mailHost = mailHost;
+    }
+
+    public static int getMailPort() {
+        return mailPort;
+    }
+
+    @Value("${mail.port:587}")
+    public void setMailPort(String mailPort) {
+        setMailPortValue(Integer.parseInt(mailPort));
+    }
+
+    public static void setMailPortValue(int mailPort) {
+        ConfigConstants.mailPort = mailPort;
+    }
+
+    public static String getMailUsername() {
+        return mailUsername;
+    }
+
+    @Value("${mail.username:}")
+    public void setMailUsername(String mailUsername) {
+        setMailUsernameValue(mailUsername);
+    }
+
+    public static void setMailUsernameValue(String mailUsername) {
+        ConfigConstants.mailUsername = mailUsername;
+    }
+
+    public static String getMailPassword() {
+        return mailPassword;
+    }
+
+    @Value("${mail.password:}")
+    public void setMailPassword(String mailPassword) {
+        setMailPasswordValue(mailPassword);
+    }
+
+    public static void setMailPasswordValue(String mailPassword) {
+        ConfigConstants.mailPassword = mailPassword;
+    }
+
+    public static Boolean isMailSmtpAuth() {
+        return mailSmtpAuth;
+    }
+
+    @Value("${mail.smtp.auth:true}")
+    public void setMailSmtpAuth(String mailSmtpAuth) {
+        setMailSmtpAuthValue(Boolean.parseBoolean(mailSmtpAuth));
+    }
+
+    public static void setMailSmtpAuthValue(Boolean mailSmtpAuth) {
+        ConfigConstants.mailSmtpAuth = mailSmtpAuth;
+    }
+
+    public static Boolean isMailStarttlsEnable() {
+        return mailStarttlsEnable;
+    }
+
+    @Value("${mail.starttls.enable:true}")
+    public void setMailStarttlsEnable(String mailStarttlsEnable) {
+        setMailStarttlsEnableValue(Boolean.parseBoolean(mailStarttlsEnable));
+    }
+
+    public static void setMailStarttlsEnableValue(Boolean mailStarttlsEnable) {
+        ConfigConstants.mailStarttlsEnable = mailStarttlsEnable;
+    }
+
+    public static Boolean isMailSslEnable() {
+        return mailSslEnable;
+    }
+
+    @Value("${mail.ssl.enable:false}")
+    public void setMailSslEnable(String mailSslEnable) {
+        setMailSslEnableValue(Boolean.parseBoolean(mailSslEnable));
+    }
+
+    public static void setMailSslEnableValue(Boolean mailSslEnable) {
+        ConfigConstants.mailSslEnable = mailSslEnable;
+    }
+
+    public static String getMailFrom() {
+        return mailFrom;
+    }
+
+    @Value("${mail.from:noreply@example.com}")
+    public void setMailFrom(String mailFrom) {
+        setMailFromValue(mailFrom);
+    }
+
+    public static void setMailFromValue(String mailFrom) {
+        ConfigConstants.mailFrom = mailFrom;
+    }
+
+    public static String getAlertEmailTo() {
+        return alertEmailTo;
+    }
+
+    @Value("${alert.email.to:admin@example.com}")
+    public void setAlertEmailTo(String alertEmailTo) {
+        setAlertEmailToValue(alertEmailTo);
+    }
+
+    public static void setAlertEmailToValue(String alertEmailTo) {
+        ConfigConstants.alertEmailTo = alertEmailTo;
     }
 
 }
