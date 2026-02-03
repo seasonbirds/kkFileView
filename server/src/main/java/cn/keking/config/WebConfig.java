@@ -1,8 +1,10 @@
 package cn.keking.config;
 
+import cn.keking.service.UserBehaviorService;
 import cn.keking.web.filter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +22,13 @@ import java.util.Set;
 public class WebConfig implements WebMvcConfigurer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(WebConfig.class);
+
+    private final UserBehaviorService userBehaviorService;
+
+    @Autowired
+    public WebConfig(UserBehaviorService userBehaviorService) {
+        this.userBehaviorService = userBehaviorService;
+    }
     /**
      * 访问外部文件配置
      */
@@ -97,6 +106,21 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<UserBehaviorFilter> getUserBehaviorFilter() {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        filterUri.add("/picturesPreview");
+        filterUri.add("/getCorsFile");
+        UserBehaviorFilter filter = new UserBehaviorFilter();
+        filter.setUserBehaviorService(userBehaviorService);
+        FilterRegistrationBean<UserBehaviorFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(5); // 设置较高的优先级，在其他过滤器之前执行
         return registrationBean;
     }
 }
