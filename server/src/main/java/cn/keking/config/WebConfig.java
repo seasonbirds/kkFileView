@@ -99,4 +99,16 @@ public class WebConfig implements WebMvcConfigurer {
         registrationBean.setUrlPatterns(filterUri);
         return registrationBean;
     }
+
+    @Bean
+    public FilterRegistrationBean<FilePreviewRankFilter> getFilePreviewRankFilter() {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        FilePreviewRankFilter filter = new FilePreviewRankFilter();
+        FilterRegistrationBean<FilePreviewRankFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(40);
+        return registrationBean;
+    }
 }
