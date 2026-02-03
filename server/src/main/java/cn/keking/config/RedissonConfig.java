@@ -188,14 +188,6 @@ public class RedissonConfig {
         this.subscriptionConnectionPoolSize = subscriptionConnectionPoolSize;
     }
 
-    public int getConnectionMinimumIdleSize() {
-        return connectionMinimumIdleSize;
-    }
-
-    public void setConnectionMinimumIdleSize(int connectionMinimumIdleSize) {
-        this.connectionMinimumIdleSize = connectionMinimumIdleSize;
-    }
-
     public int getConnectionPoolSize() {
         return connectionPoolSize;
     }
