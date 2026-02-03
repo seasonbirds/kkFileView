@@ -72,6 +72,20 @@ public class ConfigConstants {
     private static int pdfTimeout200;
     private static int pdfThread;
 
+    // 用户行为监控配置
+    private static Boolean userBehaviorMonitorEnabled;
+    private static String userBehaviorDbPath;
+    private static int userBehaviorTimeWindow;
+    private static int userBehaviorThreshold;
+    private static int userBehaviorDailyThreshold;
+    private static Boolean userBehaviorEmailEnabled;
+    private static String userBehaviorEmailSmtpHost;
+    private static int userBehaviorEmailSmtpPort;
+    private static String userBehaviorEmailUsername;
+    private static String userBehaviorEmailPassword;
+    private static String userBehaviorEmailFrom;
+    private static String userBehaviorEmailTo;
+
     public static final String DEFAULT_CACHE_ENABLED = "true";
     public static final String DEFAULT_TXT_TYPE = "txt,html,htm,asp,jsp,xml,json,properties,md,gitignore,log,java,py,c,cpp,sql,sh,bat,m,bas,prg,cmd,xbrl";
     public static final String DEFAULT_MEDIA_TYPE = "mp3,wav,mp4,flv";
@@ -115,6 +129,15 @@ public class ConfigConstants {
     public static final String DEFAULT_PDF_TIMEOUT80 = "180";
     public static final String DEFAULT_PDF_TIMEOUT200 = "300";
     public static final String DEFAULT_PDF_THREAD = "5";
+
+    // 用户行为监控默认值
+    public static final String DEFAULT_USER_BEHAVIOR_MONITOR_ENABLED = "false";
+    public static final String DEFAULT_USER_BEHAVIOR_DB_PATH = "default";
+    public static final String DEFAULT_USER_BEHAVIOR_TIME_WINDOW = "5";
+    public static final String DEFAULT_USER_BEHAVIOR_THRESHOLD = "100";
+    public static final String DEFAULT_USER_BEHAVIOR_DAILY_THRESHOLD = "1000";
+    public static final String DEFAULT_USER_BEHAVIOR_EMAIL_ENABLED = "false";
+    public static final String DEFAULT_USER_BEHAVIOR_EMAIL_SMTP_PORT = "587";
 
     public static Boolean isCacheEnabled() {
         return cacheEnabled;
@@ -811,6 +834,168 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
+    }
+
+    /**
+     * 用户行为监控配置 - getter和setter
+     */
+    public static Boolean isUserBehaviorMonitorEnabled() {
+        return userBehaviorMonitorEnabled;
+    }
+
+    @Value("${user.behavior.monitor.enabled:false}")
+    public void setUserBehaviorMonitorEnabled(String userBehaviorMonitorEnabled) {
+        setUserBehaviorMonitorEnabledValue(Boolean.parseBoolean(userBehaviorMonitorEnabled));
+    }
+
+    public static void setUserBehaviorMonitorEnabledValue(Boolean userBehaviorMonitorEnabled) {
+        ConfigConstants.userBehaviorMonitorEnabled = userBehaviorMonitorEnabled;
+    }
+
+    public static String getUserBehaviorDbPath() {
+        if (userBehaviorDbPath == null || DEFAULT_VALUE.equals(userBehaviorDbPath)) {
+            return fileDir + "user_behavior.db";
+        }
+        return userBehaviorDbPath;
+    }
+
+    @Value("${user.behavior.db.path:default}")
+    public void setUserBehaviorDbPath(String userBehaviorDbPath) {
+        setUserBehaviorDbPathValue(userBehaviorDbPath);
+    }
+
+    public static void setUserBehaviorDbPathValue(String userBehaviorDbPath) {
+        ConfigConstants.userBehaviorDbPath = userBehaviorDbPath;
+    }
+
+    public static int getUserBehaviorTimeWindow() {
+        return userBehaviorTimeWindow;
+    }
+
+    @Value("${user.behavior.time.window:5}")
+    public void setUserBehaviorTimeWindow(int userBehaviorTimeWindow) {
+        setUserBehaviorTimeWindowValue(userBehaviorTimeWindow);
+    }
+
+    public static void setUserBehaviorTimeWindowValue(int userBehaviorTimeWindow) {
+        ConfigConstants.userBehaviorTimeWindow = userBehaviorTimeWindow;
+    }
+
+    public static int getUserBehaviorThreshold() {
+        return userBehaviorThreshold;
+    }
+
+    @Value("${user.behavior.threshold:100}")
+    public void setUserBehaviorThreshold(int userBehaviorThreshold) {
+        setUserBehaviorThresholdValue(userBehaviorThreshold);
+    }
+
+    public static void setUserBehaviorThresholdValue(int userBehaviorThreshold) {
+        ConfigConstants.userBehaviorThreshold = userBehaviorThreshold;
+    }
+
+    public static int getUserBehaviorDailyThreshold() {
+        return userBehaviorDailyThreshold;
+    }
+
+    @Value("${user.behavior.daily.threshold:1000}")
+    public void setUserBehaviorDailyThreshold(int userBehaviorDailyThreshold) {
+        setUserBehaviorDailyThresholdValue(userBehaviorDailyThreshold);
+    }
+
+    public static void setUserBehaviorDailyThresholdValue(int userBehaviorDailyThreshold) {
+        ConfigConstants.userBehaviorDailyThreshold = userBehaviorDailyThreshold;
+    }
+
+    public static Boolean isUserBehaviorEmailEnabled() {
+        return userBehaviorEmailEnabled;
+    }
+
+    @Value("${user.behavior.email.enabled:false}")
+    public void setUserBehaviorEmailEnabled(String userBehaviorEmailEnabled) {
+        setUserBehaviorEmailEnabledValue(Boolean.parseBoolean(userBehaviorEmailEnabled));
+    }
+
+    public static void setUserBehaviorEmailEnabledValue(Boolean userBehaviorEmailEnabled) {
+        ConfigConstants.userBehaviorEmailEnabled = userBehaviorEmailEnabled;
+    }
+
+    public static String getUserBehaviorEmailSmtpHost() {
+        return userBehaviorEmailSmtpHost;
+    }
+
+    @Value("${user.behavior.email.smtp.host:}")
+    public void setUserBehaviorEmailSmtpHost(String userBehaviorEmailSmtpHost) {
+        setUserBehaviorEmailSmtpHostValue(userBehaviorEmailSmtpHost);
+    }
+
+    public static void setUserBehaviorEmailSmtpHostValue(String userBehaviorEmailSmtpHost) {
+        ConfigConstants.userBehaviorEmailSmtpHost = userBehaviorEmailSmtpHost;
+    }
+
+    public static int getUserBehaviorEmailSmtpPort() {
+        return userBehaviorEmailSmtpPort;
+    }
+
+    @Value("${user.behavior.email.smtp.port:587}")
+    public void setUserBehaviorEmailSmtpPort(int userBehaviorEmailSmtpPort) {
+        setUserBehaviorEmailSmtpPortValue(userBehaviorEmailSmtpPort);
+    }
+
+    public static void setUserBehaviorEmailSmtpPortValue(int userBehaviorEmailSmtpPort) {
+        ConfigConstants.userBehaviorEmailSmtpPort = userBehaviorEmailSmtpPort;
+    }
+
+    public static String getUserBehaviorEmailUsername() {
+        return userBehaviorEmailUsername;
+    }
+
+    @Value("${user.behavior.email.username:}")
+    public void setUserBehaviorEmailUsername(String userBehaviorEmailUsername) {
+        setUserBehaviorEmailUsernameValue(userBehaviorEmailUsername);
+    }
+
+    public static void setUserBehaviorEmailUsernameValue(String userBehaviorEmailUsername) {
+        ConfigConstants.userBehaviorEmailUsername = userBehaviorEmailUsername;
+    }
+
+    public static String getUserBehaviorEmailPassword() {
+        return userBehaviorEmailPassword;
+    }
+
+    @Value("${user.behavior.email.password:}")
+    public void setUserBehaviorEmailPassword(String userBehaviorEmailPassword) {
+        setUserBehaviorEmailPasswordValue(userBehaviorEmailPassword);
+    }
+
+    public static void setUserBehaviorEmailPasswordValue(String userBehaviorEmailPassword) {
+        ConfigConstants.userBehaviorEmailPassword = userBehaviorEmailPassword;
+    }
+
+    public static String getUserBehaviorEmailFrom() {
+        return userBehaviorEmailFrom;
+    }
+
+    @Value("${user.behavior.email.from:}")
+    public void setUserBehaviorEmailFrom(String userBehaviorEmailFrom) {
+        setUserBehaviorEmailFromValue(userBehaviorEmailFrom);
+    }
+
+    public static void setUserBehaviorEmailFromValue(String userBehaviorEmailFrom) {
+        ConfigConstants.userBehaviorEmailFrom = userBehaviorEmailFrom;
+    }
+
+    public static String getUserBehaviorEmailTo() {
+        return userBehaviorEmailTo;
+    }
+
+    @Value("${user.behavior.email.to:}")
+    public void setUserBehaviorEmailTo(String userBehaviorEmailTo) {
+        setUserBehaviorEmailToValue(userBehaviorEmailTo);
+    }
+
+    public static void setUserBehaviorEmailToValue(String userBehaviorEmailTo) {
+        ConfigConstants.userBehaviorEmailTo = userBehaviorEmailTo;
     }
 
 }
