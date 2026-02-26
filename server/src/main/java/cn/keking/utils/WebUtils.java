@@ -371,4 +371,38 @@ public class WebUtils {
         }
         session.removeAttribute(key);
     }
+
+    /**
+     * 获取客户端真实IP地址
+     * 支持代理服务器场景，依次检查X-Forwarded-For、X-Real-IP等头部
+     * @param request HTTP请求
+     * @return 客户端IP地址
+     */
+    public static String getClientIpAddress(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            int index = ip.indexOf(',');
+            if (index != -1) {
+                return ip.substring(0, index).trim();
+            }
+            return ip.trim();
+        }
+
+        ip = request.getHeader("X-Real-IP");
+        if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            return ip.trim();
+        }
+
+        ip = request.getHeader("Proxy-Client-IP");
+        if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            return ip.trim();
+        }
+
+        ip = request.getHeader("WL-Proxy-Client-IP");
+        if (StringUtils.isNotBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            return ip.trim();
+        }
+
+        return request.getRemoteAddr();
+    }
 }
