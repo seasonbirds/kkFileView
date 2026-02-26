@@ -99,7 +99,6 @@
             <artifactId>httpclient5</artifactId>
         </dependency>
 
-        <!-- 对 rar5 的支持 和其他众多压缩支持 可参考 package net.sf.sevenzipjbinding.ArchiveFormat; -->
         <dependency>
             <groupId>net.sf.sevenzipjbinding</groupId>
             <artifactId>sevenzipjbinding</artifactId>
@@ -275,6 +274,17 @@
             <artifactId>itextpdf</artifactId>
             <version>${itextpdf.version}</version>
          </dependency>
+
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.42.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>javax.media</groupId>

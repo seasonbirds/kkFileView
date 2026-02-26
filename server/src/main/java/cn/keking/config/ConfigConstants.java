@@ -813,4 +813,192 @@ public class ConfigConstants {
         ConfigConstants.homeSearch = homeSearch;
     }
 
+    private static Boolean userBehaviorMonitorEnabled;
+    private static int rateLimitPeriodMinutes;
+    private static int rateLimitMaxRequests;
+    private static int dailyRateLimitMaxRequests;
+    private static String mailHost;
+    private static int mailPort;
+    private static String mailUsername;
+    private static String mailPassword;
+    private static String mailFrom;
+    private static String mailTo;
+    private static String mailSubject;
+    private static String periodAlertTemplate;
+    private static String dailyAlertTemplate;
+
+    public static final String DEFAULT_USER_BEHAVIOR_MONITOR_ENABLED = "false";
+    public static final String DEFAULT_RATE_LIMIT_PERIOD_MINUTES = "10";
+    public static final String DEFAULT_RATE_LIMIT_MAX_REQUESTS = "50";
+    public static final String DEFAULT_DAILY_RATE_LIMIT_MAX_REQUESTS = "500";
+
+    public static Boolean isUserBehaviorMonitorEnabled() {
+        return userBehaviorMonitorEnabled;
+    }
+
+    @Value("${user.behavior.monitor.enabled:false}")
+    public void setUserBehaviorMonitorEnabled(String userBehaviorMonitorEnabled) {
+        setUserBehaviorMonitorEnabledValue(Boolean.parseBoolean(userBehaviorMonitorEnabled));
+    }
+
+    public static void setUserBehaviorMonitorEnabledValue(Boolean userBehaviorMonitorEnabled) {
+        ConfigConstants.userBehaviorMonitorEnabled = userBehaviorMonitorEnabled;
+    }
+
+    public static int getRateLimitPeriodMinutes() {
+        return rateLimitPeriodMinutes;
+    }
+
+    @Value("${user.behavior.rate.limit.period.minutes:10}")
+    public void setRateLimitPeriodMinutes(int rateLimitPeriodMinutes) {
+        setRateLimitPeriodMinutesValue(rateLimitPeriodMinutes);
+    }
+
+    public static void setRateLimitPeriodMinutesValue(int rateLimitPeriodMinutes) {
+        ConfigConstants.rateLimitPeriodMinutes = rateLimitPeriodMinutes;
+    }
+
+    public static int getRateLimitMaxRequests() {
+        return rateLimitMaxRequests;
+    }
+
+    @Value("${user.behavior.rate.limit.max.requests:50}")
+    public void setRateLimitMaxRequests(int rateLimitMaxRequests) {
+        setRateLimitMaxRequestsValue(rateLimitMaxRequests);
+    }
+
+    public static void setRateLimitMaxRequestsValue(int rateLimitMaxRequests) {
+        ConfigConstants.rateLimitMaxRequests = rateLimitMaxRequests;
+    }
+
+    public static int getDailyRateLimitMaxRequests() {
+        return dailyRateLimitMaxRequests;
+    }
+
+    @Value("${user.behavior.daily.rate.limit.max.requests:500}")
+    public void setDailyRateLimitMaxRequests(int dailyRateLimitMaxRequests) {
+        setDailyRateLimitMaxRequestsValue(dailyRateLimitMaxRequests);
+    }
+
+    public static void setDailyRateLimitMaxRequestsValue(int dailyRateLimitMaxRequests) {
+        ConfigConstants.dailyRateLimitMaxRequests = dailyRateLimitMaxRequests;
+    }
+
+    public static String getMailHost() {
+        return mailHost;
+    }
+
+    @Value("${spring.mail.host:}")
+    public void setMailHost(String mailHost) {
+        setMailHostValue(mailHost);
+    }
+
+    public static void setMailHostValue(String mailHost) {
+        ConfigConstants.mailHost = mailHost;
+    }
+
+    public static int getMailPort() {
+        return mailPort;
+    }
+
+    @Value("${spring.mail.port:465}")
+    public void setMailPort(int mailPort) {
+        setMailPortValue(mailPort);
+    }
+
+    public static void setMailPortValue(int mailPort) {
+        ConfigConstants.mailPort = mailPort;
+    }
+
+    public static String getMailUsername() {
+        return mailUsername;
+    }
+
+    @Value("${spring.mail.username:}")
+    public void setMailUsername(String mailUsername) {
+        setMailUsernameValue(mailUsername);
+    }
+
+    public static void setMailUsernameValue(String mailUsername) {
+        ConfigConstants.mailUsername = mailUsername;
+    }
+
+    public static String getMailPassword() {
+        return mailPassword;
+    }
+
+    @Value("${spring.mail.password:}")
+    public void setMailPassword(String mailPassword) {
+        setMailPasswordValue(mailPassword);
+    }
+
+    public static void setMailPasswordValue(String mailPassword) {
+        ConfigConstants.mailPassword = mailPassword;
+    }
+
+    public static String getMailFrom() {
+        return mailFrom;
+    }
+
+    @Value("${spring.mail.from:}")
+    public void setMailFrom(String mailFrom) {
+        setMailFromValue(mailFrom);
+    }
+
+    public static void setMailFromValue(String mailFrom) {
+        ConfigConstants.mailFrom = mailFrom;
+    }
+
+    public static String getMailTo() {
+        return mailTo;
+    }
+
+    @Value("${spring.mail.to:}")
+    public void setMailTo(String mailTo) {
+        setMailToValue(mailTo);
+    }
+
+    public static void setMailToValue(String mailTo) {
+        ConfigConstants.mailTo = mailTo;
+    }
+
+    public static String getMailSubject() {
+        return mailSubject;
+    }
+
+    @Value("${spring.mail.subject:用户行为异常告警}")
+    public void setMailSubject(String mailSubject) {
+        setMailSubjectValue(mailSubject);
+    }
+
+    public static void setMailSubjectValue(String mailSubject) {
+        ConfigConstants.mailSubject = mailSubject;
+    }
+
+    public static String getPeriodAlertTemplate() {
+        return periodAlertTemplate;
+    }
+
+    @Value("${user.behavior.alert.period.template:IP地址 %s 在过去 %d 分钟内访问了 %d 次系统，超出正常范围，请保持关注。}")
+    public void setPeriodAlertTemplate(String periodAlertTemplate) {
+        setPeriodAlertTemplateValue(periodAlertTemplate);
+    }
+
+    public static void setPeriodAlertTemplateValue(String periodAlertTemplate) {
+        ConfigConstants.periodAlertTemplate = periodAlertTemplate;
+    }
+
+    public static String getDailyAlertTemplate() {
+        return dailyAlertTemplate;
+    }
+
+    @Value("${user.behavior.alert.daily.template:IP地址 %s 今日访问次数已达 %d 次，超出每日限制，请保持关注。}")
+    public void setDailyAlertTemplate(String dailyAlertTemplate) {
+        setDailyAlertTemplateValue(dailyAlertTemplate);
+    }
+
+    public static void setDailyAlertTemplateValue(String dailyAlertTemplate) {
+        ConfigConstants.dailyAlertTemplate = dailyAlertTemplate;
+    }
+
 }
