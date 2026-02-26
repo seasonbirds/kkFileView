@@ -3,6 +3,8 @@ package cn.keking.config;
 import cn.keking.web.filter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -97,6 +99,19 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    @ConditionalOnBean(FileRankFilter.class)
+    public FilterRegistrationBean<FileRankFilter> getFileRankFilter(FileRankFilter fileRankFilter) {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        filterUri.add("/picturesPreview");
+        FilterRegistrationBean<FileRankFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(fileRankFilter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(100);
         return registrationBean;
     }
 }
