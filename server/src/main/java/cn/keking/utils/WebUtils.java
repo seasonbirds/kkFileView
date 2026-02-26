@@ -371,4 +371,55 @@ public class WebUtils {
         }
         session.removeAttribute(key);
     }
+
+    /**
+     * 从ServletRequest获取客户端真实IP地址
+     * 支持多种反向代理场景（Nginx、Apache等）
+     * @param request ServletRequest请求对象
+     * @return 客户端IP地址，获取失败时返回"unknown"
+     */
+    public static String getClientIpAddress(ServletRequest request) {
+        if (request instanceof HttpServletRequest) {
+            HttpServletRequest httpRequest = (HttpServletRequest) request;
+            String ip = httpRequest.getHeader("X-Forwarded-For");
+            if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+                ip = httpRequest.getHeader("Proxy-Client-IP");
+            }
+            if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+                ip = httpRequest.getHeader("WL-Proxy-Client-IP");
+            }
+            if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+                ip = httpRequest.getHeader("HTTP_CLIENT_IP");
+            }
+            if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+                ip = httpRequest.getHeader("HTTP_X_FORWARDED_FOR");
+            }
+            if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+                ip = httpRequest.getRemoteAddr();
+            }
+            if (ip != null && ip.contains(",")) {
+                ip = ip.split(",")[0].trim();
+            }
+            return ip != null ? ip : "unknown";
+        }
+        return request.getRemoteAddr();
+    }
+
+    /**
+     * 获取完整的请求URL（包含查询参数）
+     * @param request ServletRequest请求对象
+     * @return 完整的请求URL
+     */
+    public static String getFullRequestUrl(ServletRequest request) {
+        if (request instanceof HttpServletRequest) {
+            HttpServletRequest httpRequest = (HttpServletRequest) request;
+            String queryString = httpRequest.getQueryString();
+            String url = httpRequest.getRequestURI();
+            if (queryString != null && !queryString.isEmpty()) {
+                url = url + "?" + queryString;
+            }
+            return url;
+        }
+        return request.getServletContext().getContextPath();
+    }
 }
