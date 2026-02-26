@@ -371,4 +371,33 @@ public class WebUtils {
         }
         session.removeAttribute(key);
     }
+
+    /**
+     * 获取客户端真实IP地址
+     * @param request HTTP请求
+     * @return 客户端IP地址
+     */
+    public static String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        // 对于通过多个代理的情况，第一个IP为客户端真实IP
+        if (StringUtils.isNotBlank(ip) && ip.contains(",")) {
+            ip = ip.substring(0, ip.indexOf(",")).trim();
+        }
+        return ip;
+    }
 }

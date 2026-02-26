@@ -1,8 +1,11 @@
 package cn.keking.config;
 
+import cn.keking.service.AlertEmailService;
+import cn.keking.service.UserBehaviorService;
 import cn.keking.web.filter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -97,6 +100,25 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<UserBehaviorMonitorFilter> getUserBehaviorMonitorFilter(
+            UserBehaviorService userBehaviorService, AlertEmailService alertEmailService,
+            @Value("${behavior.monitor.enabled:false}") Boolean monitorEnabled,
+            @Value("${behavior.monitor.window.minutes:5}") Integer windowMinutes,
+            @Value("${behavior.monitor.window.max.requests:100}") Integer windowMaxRequests,
+            @Value("${behavior.monitor.daily.max.requests:1000}") Integer dailyMaxRequests) {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        filterUri.add("/picturesPreview");
+        UserBehaviorMonitorFilter filter = new UserBehaviorMonitorFilter(userBehaviorService, alertEmailService,
+                monitorEnabled, windowMinutes, windowMaxRequests, dailyMaxRequests);
+        FilterRegistrationBean<UserBehaviorMonitorFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(5);
         return registrationBean;
     }
 }
