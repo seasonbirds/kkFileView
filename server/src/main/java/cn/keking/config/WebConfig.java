@@ -1,8 +1,12 @@
 package cn.keking.config;
 
+import cn.keking.behavior.filter.UserBehaviorFilter;
+import cn.keking.behavior.service.AlertMailService;
+import cn.keking.behavior.service.RequestLogService;
 import cn.keking.web.filter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -97,6 +101,23 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<UserBehaviorFilter> getUserBehaviorFilter(
+            RequestLogService requestLogService, AlertMailService alertMailService) {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        filterUri.add("/picturesPreview");
+        filterUri.add("/getCorsFile");
+        UserBehaviorFilter filter = new UserBehaviorFilter();
+        filter.setRequestLogService(requestLogService);
+        filter.setAlertMailService(alertMailService);
+        FilterRegistrationBean<UserBehaviorFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(5);
         return registrationBean;
     }
 }
