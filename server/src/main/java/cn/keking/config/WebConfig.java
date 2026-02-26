@@ -1,5 +1,6 @@
 package cn.keking.config;
 
+import cn.keking.service.FilePreviewStatisticsService;
 import cn.keking.web.filter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,18 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<FilePreviewStatisticsFilter> getFilePreviewStatisticsFilter(FilePreviewStatisticsService statisticsService) {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        FilePreviewStatisticsFilter filter = new FilePreviewStatisticsFilter(statisticsService);
+        FilterRegistrationBean<FilePreviewStatisticsFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(40);
         return registrationBean;
     }
 }
