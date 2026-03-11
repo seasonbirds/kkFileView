@@ -36,5 +36,9 @@ public class IndexController {
         return "/main/index";
     }
 
+    @GetMapping( "/rank")
+    public String go2Rank(){
+        return "/main/rank";
+    }
 
 }

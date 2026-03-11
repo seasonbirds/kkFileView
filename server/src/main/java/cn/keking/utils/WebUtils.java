@@ -371,4 +371,17 @@ public class WebUtils {
         }
         session.removeAttribute(key);
     }
+
+    /**
+     * 从请求中获取文件名
+     * @param request 请求
+     * @return 文件名
+     */
+    public static String getFileNameFromRequest(ServletRequest request) {
+        String url = getSourceUrl(request);
+        if (url != null) {
+            return getFileNameFromURL(url);
+        }
+        return null;
+    }
 }

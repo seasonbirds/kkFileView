@@ -54,6 +54,10 @@ public class ReturnResponse<T> implements Serializable {
         return new ReturnResponse<>(SUCCESS_CODE, SUCCESS_MSG, content);
     }
 
+    public static <T> ReturnResponse<T> successWithType(T content) {
+        return new ReturnResponse<>(SUCCESS_CODE, SUCCESS_MSG, content);
+    }
+
     public boolean isSuccess(){
         return SUCCESS_CODE == code;
     }
