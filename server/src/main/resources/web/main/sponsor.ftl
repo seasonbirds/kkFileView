@@ -24,6 +24,7 @@
             <li><a href="./index">首页</a></li>
             <li><a href="./integrated">接入说明</a></li>
             <li><a href="./record">版本发布记录</a></li>
+            <li><a href="./rank">文件排行榜</a></li>
             <li class="active"><a href="./sponsor">赞助开源</a></li>
         </ul>
     </div>

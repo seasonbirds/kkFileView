@@ -2,51 +2,53 @@ package cn.keking.config;
 
 import io.netty.channel.nio.NioEventLoopGroup;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
 import org.redisson.config.Config;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ClassUtils;
 
 /**
- * Created by kl on 2017/09/26.
- * redisson 客户端配置
+ * 排行榜功能独立Redis配置
+ * 不依赖cache.type条件，始终可用
  */
-@ConditionalOnExpression("'${cache.type:default}'.equals('redis')")
 @ConfigurationProperties(prefix = "spring.redisson")
 @Configuration
-public class RedissonConfig {
+public class FileRankRedisConfig {
 
     private String address;
     private int connectionMinimumIdleSize = 10;
-    private int idleConnectionTimeout=10000;
-    private int pingTimeout=1000;
-    private int connectTimeout=10000;
-    private int timeout=3000;
-    private int retryAttempts=3;
-    private int retryInterval=1500;
-    private int reconnectionTimeout=3000;
-    private int failedAttempts=3;
+    private int idleConnectionTimeout = 10000;
+    private int pingTimeout = 1000;
+    private int connectTimeout = 10000;
+    private int timeout = 3000;
+    private int retryAttempts = 3;
+    private int retryInterval = 1500;
+    private int reconnectionTimeout = 3000;
+    private int failedAttempts = 3;
     private String password = null;
-    private int subscriptionsPerConnection=5;
-    private String clientName=null;
+    private int subscriptionsPerConnection = 5;
+    private String clientName = null;
     private int subscriptionConnectionMinimumIdleSize = 1;
     private int subscriptionConnectionPoolSize = 50;
     private int connectionPoolSize = 64;
     private int database = 0;
     private boolean dnsMonitoring = false;
     private int dnsMonitoringInterval = 5000;
+    private int thread;
+    private String codec = "org.redisson.codec.JsonJacksonCodec";
 
-    private int thread; //当前处理核数量 * 2
-
-    private String codec="org.redisson.codec.JsonJacksonCodec";
-
-    @Bean
-    Config config() throws Exception {
+    @Bean(name = "fileRankRedissonClient")
+    public RedissonClient fileRankRedissonClient() throws Exception {
         Config config = new Config();
-        config.useSingleServer().setAddress(address)
+        String redisAddress = address != null ? address : "redis://127.0.0.1:6379";
+        if (!redisAddress.startsWith("redis://")) {
+            redisAddress = "redis://" + redisAddress;
+        }
+        config.useSingleServer().setAddress(redisAddress)
                 .setConnectionMinimumIdleSize(connectionMinimumIdleSize)
                 .setConnectionPoolSize(connectionPoolSize)
                 .setDatabase(database)
@@ -61,14 +63,12 @@ public class RedissonConfig {
                 .setConnectTimeout(connectTimeout)
                 .setIdleConnectionTimeout(idleConnectionTimeout)
                 .setPassword(StringUtils.trimToNull(password));
-        Codec codec=(Codec) ClassUtils.forName(getCodec(), ClassUtils.getDefaultClassLoader()).newInstance();
+        Codec codec = (Codec) ClassUtils.forName(getCodec(), ClassUtils.getDefaultClassLoader()).newInstance();
         config.setCodec(codec);
         config.setThreads(thread);
         config.setEventLoopGroup(new NioEventLoopGroup());
-        return config;
+        return Redisson.create(config);
     }
-
-
 
     public int getThread() {
         return thread;
