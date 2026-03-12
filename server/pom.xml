@@ -309,6 +309,30 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+
+        <!-- SQLite for user behavior recording -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.45.0.0</version>
+        </dependency>
+        <!-- Hibernate community dialects for SQLite support -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-community-dialects</artifactId>
+            <version>6.6.3.Final</version>
+        </dependency>
+        <!-- Spring Data JPA for database operations -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <!-- Email for alert notifications -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
         <!-- test dependency - end -->
     </dependencies>
 

@@ -72,7 +72,27 @@ public class ConfigConstants {
     private static int pdfTimeout200;
     private static int pdfThread;
 
+    // 用户行为监控与异常检测配置
+    private static Boolean monitorEnabled;
+    private static String monitorDbPath;
+    private static Integer monitorFrequencyWindowMinutes;
+    private static Integer monitorFrequencyMaxRequests;
+    private static Integer monitorDailyMaxRequests;
+    private static Integer monitorBlockDurationMinutes;
+    private static Boolean monitorAlertEmailEnabled;
+    private static String monitorAlertEmailTo;
+    private static String monitorAlertEmailSubject;
+
     public static final String DEFAULT_CACHE_ENABLED = "true";
+    public static final String DEFAULT_MONITOR_ENABLED = "true";
+    public static final String DEFAULT_MONITOR_DB_PATH = "./user_behavior.db";
+    public static final String DEFAULT_MONITOR_FREQUENCY_WINDOW_MINUTES = "5";
+    public static final String DEFAULT_MONITOR_FREQUENCY_MAX_REQUESTS = "30";
+    public static final String DEFAULT_MONITOR_DAILY_MAX_REQUESTS = "200";
+    public static final String DEFAULT_MONITOR_BLOCK_DURATION_MINUTES = "30";
+    public static final String DEFAULT_MONITOR_ALERT_EMAIL_ENABLED = "false";
+    public static final String DEFAULT_MONITOR_ALERT_EMAIL_TO = "admin@example.com";
+    public static final String DEFAULT_MONITOR_ALERT_EMAIL_SUBJECT = "[告警] kkFileView 异常访问检测";
     public static final String DEFAULT_TXT_TYPE = "txt,html,htm,asp,jsp,xml,json,properties,md,gitignore,log,java,py,c,cpp,sql,sh,bat,m,bas,prg,cmd,xbrl";
     public static final String DEFAULT_MEDIA_TYPE = "mp3,wav,mp4,flv";
     public static final String DEFAULT_OFFICE_PREVIEW_TYPE = "image";
@@ -811,6 +831,125 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
+    }
+
+    // ==================== 用户行为监控与异常检测配置 ====================
+
+    public static Boolean getMonitorEnabled() {
+        return monitorEnabled;
+    }
+
+    @Value("${monitor.enabled:true}")
+    public void setMonitorEnabled(String monitorEnabled) {
+        setMonitorEnabledValue(Boolean.parseBoolean(monitorEnabled));
+    }
+
+    public static void setMonitorEnabledValue(Boolean monitorEnabled) {
+        ConfigConstants.monitorEnabled = monitorEnabled;
+    }
+
+    public static String getMonitorDbPath() {
+        return monitorDbPath;
+    }
+
+    @Value("${monitor.db.path:./user_behavior.db}")
+    public void setMonitorDbPath(String monitorDbPath) {
+        setMonitorDbPathValue(monitorDbPath);
+    }
+
+    public static void setMonitorDbPathValue(String monitorDbPath) {
+        ConfigConstants.monitorDbPath = monitorDbPath;
+    }
+
+    public static Integer getMonitorFrequencyWindowMinutes() {
+        return monitorFrequencyWindowMinutes;
+    }
+
+    @Value("${monitor.frequency.window.minutes:5}")
+    public void setMonitorFrequencyWindowMinutes(String monitorFrequencyWindowMinutes) {
+        setMonitorFrequencyWindowMinutesValue(Integer.parseInt(monitorFrequencyWindowMinutes));
+    }
+
+    public static void setMonitorFrequencyWindowMinutesValue(Integer monitorFrequencyWindowMinutes) {
+        ConfigConstants.monitorFrequencyWindowMinutes = monitorFrequencyWindowMinutes;
+    }
+
+    public static Integer getMonitorFrequencyMaxRequests() {
+        return monitorFrequencyMaxRequests;
+    }
+
+    @Value("${monitor.frequency.max.requests:30}")
+    public void setMonitorFrequencyMaxRequests(String monitorFrequencyMaxRequests) {
+        setMonitorFrequencyMaxRequestsValue(Integer.parseInt(monitorFrequencyMaxRequests));
+    }
+
+    public static void setMonitorFrequencyMaxRequestsValue(Integer monitorFrequencyMaxRequests) {
+        ConfigConstants.monitorFrequencyMaxRequests = monitorFrequencyMaxRequests;
+    }
+
+    public static Integer getMonitorDailyMaxRequests() {
+        return monitorDailyMaxRequests;
+    }
+
+    @Value("${monitor.daily.max.requests:200}")
+    public void setMonitorDailyMaxRequests(String monitorDailyMaxRequests) {
+        setMonitorDailyMaxRequestsValue(Integer.parseInt(monitorDailyMaxRequests));
+    }
+
+    public static void setMonitorDailyMaxRequestsValue(Integer monitorDailyMaxRequests) {
+        ConfigConstants.monitorDailyMaxRequests = monitorDailyMaxRequests;
+    }
+
+    public static Integer getMonitorBlockDurationMinutes() {
+        return monitorBlockDurationMinutes;
+    }
+
+    @Value("${monitor.block.duration.minutes:30}")
+    public void setMonitorBlockDurationMinutes(String monitorBlockDurationMinutes) {
+        setMonitorBlockDurationMinutesValue(Integer.parseInt(monitorBlockDurationMinutes));
+    }
+
+    public static void setMonitorBlockDurationMinutesValue(Integer monitorBlockDurationMinutes) {
+        ConfigConstants.monitorBlockDurationMinutes = monitorBlockDurationMinutes;
+    }
+
+    public static Boolean getMonitorAlertEmailEnabled() {
+        return monitorAlertEmailEnabled;
+    }
+
+    @Value("${monitor.alert.email.enabled:false}")
+    public void setMonitorAlertEmailEnabled(String monitorAlertEmailEnabled) {
+        setMonitorAlertEmailEnabledValue(Boolean.parseBoolean(monitorAlertEmailEnabled));
+    }
+
+    public static void setMonitorAlertEmailEnabledValue(Boolean monitorAlertEmailEnabled) {
+        ConfigConstants.monitorAlertEmailEnabled = monitorAlertEmailEnabled;
+    }
+
+    public static String getMonitorAlertEmailTo() {
+        return monitorAlertEmailTo;
+    }
+
+    @Value("${monitor.alert.email.to:admin@example.com}")
+    public void setMonitorAlertEmailTo(String monitorAlertEmailTo) {
+        setMonitorAlertEmailToValue(monitorAlertEmailTo);
+    }
+
+    public static void setMonitorAlertEmailToValue(String monitorAlertEmailTo) {
+        ConfigConstants.monitorAlertEmailTo = monitorAlertEmailTo;
+    }
+
+    public static String getMonitorAlertEmailSubject() {
+        return monitorAlertEmailSubject;
+    }
+
+    @Value("${monitor.alert.email.subject:[告警] kkFileView 异常访问检测}")
+    public void setMonitorAlertEmailSubject(String monitorAlertEmailSubject) {
+        setMonitorAlertEmailSubjectValue(monitorAlertEmailSubject);
+    }
+
+    public static void setMonitorAlertEmailSubjectValue(String monitorAlertEmailSubject) {
+        ConfigConstants.monitorAlertEmailSubject = monitorAlertEmailSubject;
     }
 
 }
