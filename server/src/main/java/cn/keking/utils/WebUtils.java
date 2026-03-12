@@ -371,4 +371,28 @@ public class WebUtils {
         }
         session.removeAttribute(key);
     }
+
+    /**
+     * 获取客户端真实IP地址
+     *
+     * @param request HTTP请求对象
+     * @return 客户端IP地址
+     */
+    public static String getClientIpAddress(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
+            int index = xForwardedFor.indexOf(',');
+            if (index != -1) {
+                return xForwardedFor.substring(0, index);
+            }
+            return xForwardedFor;
+        }
+
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
+            return xRealIp;
+        }
+
+        return request.getRemoteAddr();
+    }
 }
