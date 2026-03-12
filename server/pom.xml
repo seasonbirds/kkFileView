@@ -309,6 +309,17 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- SQLite数据库驱动 -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.45.0.0</version>
+        </dependency>
+        <!-- Spring Mail邮件发送 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
         <!-- test dependency - end -->
     </dependencies>
 

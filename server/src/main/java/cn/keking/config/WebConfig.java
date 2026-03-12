@@ -99,4 +99,18 @@ public class WebConfig implements WebMvcConfigurer {
         registrationBean.setUrlPatterns(filterUri);
         return registrationBean;
     }
+
+    @Bean
+    public FilterRegistrationBean<UserBehaviorMonitorFilter> getUserBehaviorMonitorFilter() {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        filterUri.add("/picturesPreview");
+        filterUri.add("/getCorsFile");
+        UserBehaviorMonitorFilter filter = new UserBehaviorMonitorFilter();
+        FilterRegistrationBean<UserBehaviorMonitorFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(5);
+        return registrationBean;
+    }
 }

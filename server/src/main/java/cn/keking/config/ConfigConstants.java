@@ -72,6 +72,20 @@ public class ConfigConstants {
     private static int pdfTimeout200;
     private static int pdfThread;
 
+    // 用户行为监控配置
+    private static Boolean behaviorMonitorEnabled;
+    private static Integer behaviorMonitorTimeWindow;
+    private static Integer behaviorMonitorMaxRequests;
+    private static Integer behaviorMonitorDailyMaxRequests;
+    private static String behaviorMonitorEmailHost;
+    private static Integer behaviorMonitorEmailPort;
+    private static String behaviorMonitorEmailUsername;
+    private static String behaviorMonitorEmailPassword;
+    private static String behaviorMonitorEmailFrom;
+    private static String behaviorMonitorEmailTo;
+    private static String behaviorMonitorEmailSubject;
+    private static String behaviorMonitorEmailContent;
+
     public static final String DEFAULT_CACHE_ENABLED = "true";
     public static final String DEFAULT_TXT_TYPE = "txt,html,htm,asp,jsp,xml,json,properties,md,gitignore,log,java,py,c,cpp,sql,sh,bat,m,bas,prg,cmd,xbrl";
     public static final String DEFAULT_MEDIA_TYPE = "mp3,wav,mp4,flv";
@@ -115,6 +129,20 @@ public class ConfigConstants {
     public static final String DEFAULT_PDF_TIMEOUT80 = "180";
     public static final String DEFAULT_PDF_TIMEOUT200 = "300";
     public static final String DEFAULT_PDF_THREAD = "5";
+
+    // 用户行为监控默认配置
+    public static final String DEFAULT_BEHAVIOR_MONITOR_ENABLED = "false";
+    public static final String DEFAULT_BEHAVIOR_MONITOR_TIME_WINDOW = "10";
+    public static final String DEFAULT_BEHAVIOR_MONITOR_MAX_REQUESTS = "50";
+    public static final String DEFAULT_BEHAVIOR_MONITOR_DAILY_MAX_REQUESTS = "500";
+    public static final String DEFAULT_BEHAVIOR_MONITOR_EMAIL_HOST = "smtp.qq.com";
+    public static final String DEFAULT_BEHAVIOR_MONITOR_EMAIL_PORT = "587";
+    public static final String DEFAULT_BEHAVIOR_MONITOR_EMAIL_USERNAME = "";
+    public static final String DEFAULT_BEHAVIOR_MONITOR_EMAIL_PASSWORD = "";
+    public static final String DEFAULT_BEHAVIOR_MONITOR_EMAIL_FROM = "";
+    public static final String DEFAULT_BEHAVIOR_MONITOR_EMAIL_TO = "";
+    public static final String DEFAULT_BEHAVIOR_MONITOR_EMAIL_SUBJECT = "用户行为异常";
+    public static final String DEFAULT_BEHAVIOR_MONITOR_EMAIL_CONTENT = "IP地址%s在过去%d分钟内访问了%d次系统，超出正常范围，请保持关注。";
 
     public static Boolean isCacheEnabled() {
         return cacheEnabled;
@@ -811,6 +839,164 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
+    }
+
+    // ==================== 用户行为监控配置 ====================
+
+    public static Boolean isBehaviorMonitorEnabled() {
+        return behaviorMonitorEnabled;
+    }
+
+    @Value("${behavior.monitor.enabled:false}")
+    public void setBehaviorMonitorEnabled(String behaviorMonitorEnabled) {
+        setBehaviorMonitorEnabledValue(Boolean.parseBoolean(behaviorMonitorEnabled));
+    }
+
+    public static void setBehaviorMonitorEnabledValue(Boolean behaviorMonitorEnabled) {
+        ConfigConstants.behaviorMonitorEnabled = behaviorMonitorEnabled;
+    }
+
+    public static Integer getBehaviorMonitorTimeWindow() {
+        return behaviorMonitorTimeWindow;
+    }
+
+    @Value("${behavior.monitor.time.window:10}")
+    public void setBehaviorMonitorTimeWindow(String behaviorMonitorTimeWindow) {
+        setBehaviorMonitorTimeWindowValue(Integer.parseInt(behaviorMonitorTimeWindow));
+    }
+
+    public static void setBehaviorMonitorTimeWindowValue(Integer behaviorMonitorTimeWindow) {
+        ConfigConstants.behaviorMonitorTimeWindow = behaviorMonitorTimeWindow;
+    }
+
+    public static Integer getBehaviorMonitorMaxRequests() {
+        return behaviorMonitorMaxRequests;
+    }
+
+    @Value("${behavior.monitor.max.requests:50}")
+    public void setBehaviorMonitorMaxRequests(String behaviorMonitorMaxRequests) {
+        setBehaviorMonitorMaxRequestsValue(Integer.parseInt(behaviorMonitorMaxRequests));
+    }
+
+    public static void setBehaviorMonitorMaxRequestsValue(Integer behaviorMonitorMaxRequests) {
+        ConfigConstants.behaviorMonitorMaxRequests = behaviorMonitorMaxRequests;
+    }
+
+    public static Integer getBehaviorMonitorDailyMaxRequests() {
+        return behaviorMonitorDailyMaxRequests;
+    }
+
+    @Value("${behavior.monitor.daily.max.requests:500}")
+    public void setBehaviorMonitorDailyMaxRequests(String behaviorMonitorDailyMaxRequests) {
+        setBehaviorMonitorDailyMaxRequestsValue(Integer.parseInt(behaviorMonitorDailyMaxRequests));
+    }
+
+    public static void setBehaviorMonitorDailyMaxRequestsValue(Integer behaviorMonitorDailyMaxRequests) {
+        ConfigConstants.behaviorMonitorDailyMaxRequests = behaviorMonitorDailyMaxRequests;
+    }
+
+    public static String getBehaviorMonitorEmailHost() {
+        return behaviorMonitorEmailHost;
+    }
+
+    @Value("${behavior.monitor.email.host:smtp.qq.com}")
+    public void setBehaviorMonitorEmailHost(String behaviorMonitorEmailHost) {
+        setBehaviorMonitorEmailHostValue(behaviorMonitorEmailHost);
+    }
+
+    public static void setBehaviorMonitorEmailHostValue(String behaviorMonitorEmailHost) {
+        ConfigConstants.behaviorMonitorEmailHost = behaviorMonitorEmailHost;
+    }
+
+    public static Integer getBehaviorMonitorEmailPort() {
+        return behaviorMonitorEmailPort;
+    }
+
+    @Value("${behavior.monitor.email.port:587}")
+    public void setBehaviorMonitorEmailPort(String behaviorMonitorEmailPort) {
+        setBehaviorMonitorEmailPortValue(Integer.parseInt(behaviorMonitorEmailPort));
+    }
+
+    public static void setBehaviorMonitorEmailPortValue(Integer behaviorMonitorEmailPort) {
+        ConfigConstants.behaviorMonitorEmailPort = behaviorMonitorEmailPort;
+    }
+
+    public static String getBehaviorMonitorEmailUsername() {
+        return behaviorMonitorEmailUsername;
+    }
+
+    @Value("${behavior.monitor.email.username:}")
+    public void setBehaviorMonitorEmailUsername(String behaviorMonitorEmailUsername) {
+        setBehaviorMonitorEmailUsernameValue(behaviorMonitorEmailUsername);
+    }
+
+    public static void setBehaviorMonitorEmailUsernameValue(String behaviorMonitorEmailUsername) {
+        ConfigConstants.behaviorMonitorEmailUsername = behaviorMonitorEmailUsername;
+    }
+
+    public static String getBehaviorMonitorEmailPassword() {
+        return behaviorMonitorEmailPassword;
+    }
+
+    @Value("${behavior.monitor.email.password:}")
+    public void setBehaviorMonitorEmailPassword(String behaviorMonitorEmailPassword) {
+        setBehaviorMonitorEmailPasswordValue(behaviorMonitorEmailPassword);
+    }
+
+    public static void setBehaviorMonitorEmailPasswordValue(String behaviorMonitorEmailPassword) {
+        ConfigConstants.behaviorMonitorEmailPassword = behaviorMonitorEmailPassword;
+    }
+
+    public static String getBehaviorMonitorEmailFrom() {
+        return behaviorMonitorEmailFrom;
+    }
+
+    @Value("${behavior.monitor.email.from:}")
+    public void setBehaviorMonitorEmailFrom(String behaviorMonitorEmailFrom) {
+        setBehaviorMonitorEmailFromValue(behaviorMonitorEmailFrom);
+    }
+
+    public static void setBehaviorMonitorEmailFromValue(String behaviorMonitorEmailFrom) {
+        ConfigConstants.behaviorMonitorEmailFrom = behaviorMonitorEmailFrom;
+    }
+
+    public static String getBehaviorMonitorEmailTo() {
+        return behaviorMonitorEmailTo;
+    }
+
+    @Value("${behavior.monitor.email.to:}")
+    public void setBehaviorMonitorEmailTo(String behaviorMonitorEmailTo) {
+        setBehaviorMonitorEmailToValue(behaviorMonitorEmailTo);
+    }
+
+    public static void setBehaviorMonitorEmailToValue(String behaviorMonitorEmailTo) {
+        ConfigConstants.behaviorMonitorEmailTo = behaviorMonitorEmailTo;
+    }
+
+    public static String getBehaviorMonitorEmailSubject() {
+        return behaviorMonitorEmailSubject;
+    }
+
+    @Value("${behavior.monitor.email.subject:用户行为异常}")
+    public void setBehaviorMonitorEmailSubject(String behaviorMonitorEmailSubject) {
+        setBehaviorMonitorEmailSubjectValue(behaviorMonitorEmailSubject);
+    }
+
+    public static void setBehaviorMonitorEmailSubjectValue(String behaviorMonitorEmailSubject) {
+        ConfigConstants.behaviorMonitorEmailSubject = behaviorMonitorEmailSubject;
+    }
+
+    public static String getBehaviorMonitorEmailContent() {
+        return behaviorMonitorEmailContent;
+    }
+
+    @Value("${behavior.monitor.email.content:IP地址%s在过去%d分钟内访问了%d次系统，超出正常范围，请保持关注。}")
+    public void setBehaviorMonitorEmailContent(String behaviorMonitorEmailContent) {
+        setBehaviorMonitorEmailContentValue(behaviorMonitorEmailContent);
+    }
+
+    public static void setBehaviorMonitorEmailContentValue(String behaviorMonitorEmailContent) {
+        ConfigConstants.behaviorMonitorEmailContent = behaviorMonitorEmailContent;
     }
 
 }
