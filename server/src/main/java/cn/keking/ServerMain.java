@@ -8,10 +8,12 @@ import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.StopWatch;
 
 @SpringBootApplication
+@EnableAsync
 @EnableScheduling
 @ComponentScan(value = "cn.keking.*")
 public class ServerMain {

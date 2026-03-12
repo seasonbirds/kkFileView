@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>访问被拒绝</title>
+    <style type="text/css">
+        body {
+            margin: 0 auto;
+            width: 900px;
+            background-color: #f5f5f5;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        .container {
+            width: 700px;
+            margin: 100px auto;
+            text-align: center;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .error-icon {
+            font-size: 80px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #e74c3c;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .info-item {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .label {
+            display: inline-block;
+            width: 100px;
+            color: #6c757d;
+            font-weight: bold;
+        }
+
+        .value {
+            color: #343a40;
+        }
+
+        .ip-address {
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        .contact-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .contact-info a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .countdown {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="error-icon">🚫</div>
+    <h1>访问被暂时禁止</h1>
+    <p>您的IP地址由于异常访问行为已被系统暂时封禁。</p>
+
+    <div class="info-box">
+        <div class="info-item">
+            <span class="label">IP地址：</span>
+            <span class="value ip-address">${ip_address}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">封禁原因：</span>
+            <span class="value">${block_reason}</span>
+        </div>
+        <div class="info-item">
+            <span class="label">解封时间：</span>
+            <span class="value countdown">${block_end_time}</span>
+        </div>
+    </div>
+
+    <div class="contact-info">
+        <p>如果您认为这是误判，请联系系统管理员。</p>
+        <p>有任何疑问，请加入kk开源社区知识星球咨询：<a href="https://t.zsxq.com/09ZHSXbsQ">https://t.zsxq.com/09ZHSXbsQ</a></p>
+    </div>
+</div>
+</body>
+</html>
