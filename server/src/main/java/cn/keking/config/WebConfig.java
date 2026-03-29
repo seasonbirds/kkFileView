@@ -69,6 +69,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean<BaseUrlFilter> getBaseUrlFilter() {
         Set<String> filterUri = new HashSet<>();
+        filterUri.add("/ranking");
         BaseUrlFilter filter = new BaseUrlFilter();
         FilterRegistrationBean<BaseUrlFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
@@ -93,8 +94,21 @@ public class WebConfig implements WebMvcConfigurer {
         filterUri.add("/");
         filterUri.add("/onlinePreview");
         filterUri.add("/picturesPreview");
+        filterUri.add("/ranking");
         AttributeSetFilter filter = new AttributeSetFilter();
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<FilePreviewStatisticsFilter> getFilePreviewStatisticsFilter() {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        filterUri.add("/picturesPreview");
+        FilePreviewStatisticsFilter filter = new FilePreviewStatisticsFilter();
+        FilterRegistrationBean<FilePreviewStatisticsFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
         return registrationBean;
