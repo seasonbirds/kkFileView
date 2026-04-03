@@ -813,4 +813,34 @@ public class ConfigConstants {
         ConfigConstants.homeSearch = homeSearch;
     }
 
+    // 限流配置
+    private static int rateLimitPeriod = 60000; // 默认60秒
+    private static int rateLimitCount = 100; // 默认100次
+
+    public static int getRateLimitPeriod() {
+        return rateLimitPeriod;
+    }
+
+    @Value("${rate.limit.period:60000}")
+    public void setRateLimitPeriod(int rateLimitPeriod) {
+        setRateLimitPeriodValue(rateLimitPeriod);
+    }
+
+    public static void setRateLimitPeriodValue(int rateLimitPeriod) {
+        ConfigConstants.rateLimitPeriod = rateLimitPeriod;
+    }
+
+    public static int getRateLimitCount() {
+        return rateLimitCount;
+    }
+
+    @Value("${rate.limit.count:100}")
+    public void setRateLimitCount(int rateLimitCount) {
+        setRateLimitCountValue(rateLimitCount);
+    }
+
+    public static void setRateLimitCountValue(int rateLimitCount) {
+        ConfigConstants.rateLimitCount = rateLimitCount;
+    }
+
 }
