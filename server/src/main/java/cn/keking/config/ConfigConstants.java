@@ -71,6 +71,8 @@ public class ConfigConstants {
     private static int pdfTimeout80;
     private static int pdfTimeout200;
     private static int pdfThread;
+    private static int rateLimitMaxRequests;
+    private static int rateLimitPeriodSeconds;
 
     public static final String DEFAULT_CACHE_ENABLED = "true";
     public static final String DEFAULT_TXT_TYPE = "txt,html,htm,asp,jsp,xml,json,properties,md,gitignore,log,java,py,c,cpp,sql,sh,bat,m,bas,prg,cmd,xbrl";
@@ -115,6 +117,8 @@ public class ConfigConstants {
     public static final String DEFAULT_PDF_TIMEOUT80 = "180";
     public static final String DEFAULT_PDF_TIMEOUT200 = "300";
     public static final String DEFAULT_PDF_THREAD = "5";
+    public static final String DEFAULT_RATE_LIMIT_MAX_REQUESTS = "10";
+    public static final String DEFAULT_RATE_LIMIT_PERIOD_SECONDS = "60";
 
     public static Boolean isCacheEnabled() {
         return cacheEnabled;
@@ -811,6 +815,32 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
+    }
+
+    public static int getRateLimitMaxRequests() {
+        return rateLimitMaxRequests;
+    }
+
+    @Value("${rate.limit.max.requests:10}")
+    public void setRateLimitMaxRequests(int rateLimitMaxRequests) {
+        setRateLimitMaxRequestsValue(rateLimitMaxRequests);
+    }
+
+    public static void setRateLimitMaxRequestsValue(int rateLimitMaxRequests) {
+        ConfigConstants.rateLimitMaxRequests = rateLimitMaxRequests;
+    }
+
+    public static int getRateLimitPeriodSeconds() {
+        return rateLimitPeriodSeconds;
+    }
+
+    @Value("${rate.limit.period.seconds:60}")
+    public void setRateLimitPeriodSeconds(int rateLimitPeriodSeconds) {
+        setRateLimitPeriodSecondsValue(rateLimitPeriodSeconds);
+    }
+
+    public static void setRateLimitPeriodSecondsValue(int rateLimitPeriodSeconds) {
+        ConfigConstants.rateLimitPeriodSeconds = rateLimitPeriodSeconds;
     }
 
 }
