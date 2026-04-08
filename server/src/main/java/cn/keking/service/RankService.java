@@ -1,15 +1,12 @@
 package cn.keking.service;
 
-import cn.keking.config.RankRedisConfig;
-import org.redisson.Redisson;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +19,7 @@ import java.util.List;
  * 1. 使用Redis的Sorted Set数据结构，这是实现排行榜的最优方式
  * 2. 预览次数统计使用异步操作，不阻塞主流程
  * 3. Redis操作天然支持原子性，保证高并发场景下的线程安全
+ * 4. 注入由RankRedisConfig创建的rankRedissonClient Bean
  *
  * @author kkFileView
  */
@@ -33,38 +31,16 @@ public class RankService {
     private static final String RANK_KEY = "kkFileView:file:preview:rank";
     private static final String FILE_NAME_PREFIX = "kkFileView:file:name:";
 
-    private final RankRedisConfig rankRedisConfig;
-    private RedissonClient redissonClient;
-
-    public RankService(RankRedisConfig rankRedisConfig) {
-        this.rankRedisConfig = rankRedisConfig;
-    }
+    private final RedissonClient redissonClient;
 
     /**
-     * 初始化Redis客户端
-     * 在服务启动时创建Redisson连接
+     * 构造函数，注入排行榜专用的RedissonClient
+     *
+     * @param redissonClient 由RankRedisConfig创建的RedissonClient Bean
      */
-    @PostConstruct
-    public void init() {
-        try {
-            Config config = rankRedisConfig.rankRedisConfig();
-            this.redissonClient = Redisson.create(config);
-            logger.info("Rank Redis client initialized successfully");
-        } catch (Exception e) {
-            logger.error("Failed to initialize Rank Redis client: {}", e.getMessage());
-        }
-    }
-
-    /**
-     * 销毁Redis客户端
-     * 在服务关闭时释放Redisson连接
-     */
-    @PreDestroy
-    public void destroy() {
-        if (redissonClient != null) {
-            redissonClient.shutdown();
-            logger.info("Rank Redis client shutdown");
-        }
+    public RankService(@Qualifier("rankRedissonClient") RedissonClient redissonClient) {
+        this.redissonClient = redissonClient;
+        logger.info("RankService initialized with rankRedissonClient");
     }
 
     /**
