@@ -123,7 +123,7 @@
         $('.top-btn').removeClass('btn-success').addClass('btn-default');
         $('.top-btn[data-top="' + topN + '"]').removeClass('btn-default').addClass('btn-success');
 
-        $.getJSON('${baseUrl}api/rank?topN=' + topN, function(data) {
+        $.getJSON('api/rank?topN=' + topN, function(data) {
             if (data.data) {
                 $('#rankTable').bootstrapTable('load', data.data);
             }
@@ -134,7 +134,7 @@
         $('.top-btn[data-top="' + currentTopN + '"]').removeClass('btn-default').addClass('btn-success');
 
         $('#rankTable').bootstrapTable({
-            url: '${baseUrl}api/rank?topN=' + currentTopN,
+            url: 'api/rank?topN=' + currentTopN,
             method: 'get',
             pagination: true,
             pageSize: currentTopN > 50 ? 50 : currentTopN,

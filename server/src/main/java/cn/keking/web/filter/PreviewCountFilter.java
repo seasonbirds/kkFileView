@@ -37,10 +37,11 @@ public class PreviewCountFilter implements Filter {
 
     /**
      * 执行过滤逻辑
-     * 1. 解码URL参数获取文件URL
-     * 2. 从URL中提取文件名
-     * 3. 先执行后续过滤器链（确保预览请求正常处理）
-     * 4. 异步统计预览次数
+     * 1. 解码URL参数获取文件URL和文件名
+     * 2. 执行后续过滤器链（确保预览请求正常处理）
+     * 3. 请求处理完成后，异步统计预览次数
+     *
+     * 注意：filterChain.doFilter只执行一次，避免重复调用
      *
      * @param request 请求对象
      * @param response 响应对象
@@ -53,14 +54,14 @@ public class PreviewCountFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String urlParam = httpRequest.getParameter("url");
 
+        String fileUrl = null;
+        String fileName = null;
+
         if (urlParam != null && !urlParam.isEmpty()) {
             try {
-                String fileUrl = WebUtils.decodeUrl(urlParam);
+                fileUrl = WebUtils.decodeUrl(urlParam);
                 if (fileUrl != null && !fileUrl.isEmpty()) {
-                    String fileName = WebUtils.getFileNameFromURL(fileUrl);
-                    filterChain.doFilter(request, response);
-                    rankService.incrementPreviewCount(fileUrl, fileName);
-                    return;
+                    fileName = WebUtils.getFileNameFromURL(fileUrl);
                 }
             } catch (Exception e) {
                 logger.warn("Failed to decode url for preview count: {}", urlParam, e);
@@ -68,6 +69,14 @@ public class PreviewCountFilter implements Filter {
         }
 
         filterChain.doFilter(request, response);
+
+        if (fileUrl != null && !fileUrl.isEmpty()) {
+            try {
+                rankService.incrementPreviewCount(fileUrl, fileName);
+            } catch (Exception e) {
+                logger.warn("Failed to increment preview count for file: {}", fileUrl, e);
+            }
+        }
     }
 
     @Override

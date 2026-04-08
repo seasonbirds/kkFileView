@@ -2,6 +2,8 @@ package cn.keking.config;
 
 import io.netty.channel.nio.NioEventLoopGroup;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
 import org.redisson.config.Config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,11 +16,14 @@ import org.springframework.util.ClassUtils;
  * 使用独立的Redis配置，不影响系统原有的Redis缓存功能
  * 配置前缀：rank.redis.*
  *
+ * 本配置类创建RedissonClient Bean，供RankService使用
+ * 使用独立的数据库（默认database=1），避免与系统原有Redis缓存冲突
+ *
  * @author kkFileView
  */
 @ConfigurationProperties(prefix = "rank.redis")
 @Configuration
-public class mvn {
+public class RankRedisConfig {
 
     private String address = "127.0.0.1:6379";
     private int connectionMinimumIdleSize = 5;
@@ -41,14 +46,14 @@ public class mvn {
     private String codec = "org.redisson.codec.JsonJacksonCodec";
 
     /**
-     * 创建排行榜Redis配置
+     * 创建排行榜RedissonClient Bean
      * 使用独立的数据库（默认database=1），避免与系统原有Redis缓存冲突
      *
-     * @return Redisson配置对象
+     * @return RedissonClient实例
      * @throws Exception 配置创建异常
      */
-    @Bean(name = "rankRedisConfig")
-    public Config rankRedisConfig() throws Exception {
+    @Bean(name = "rankRedissonClient", destroyMethod = "shutdown")
+    public RedissonClient rankRedissonClient() throws Exception {
         Config config = new Config();
         config.useSingleServer().setAddress("redis://" + address)
                 .setConnectionMinimumIdleSize(connectionMinimumIdleSize)
@@ -69,7 +74,7 @@ public class mvn {
         config.setCodec(codecInstance);
         config.setThreads(thread);
         config.setEventLoopGroup(new NioEventLoopGroup());
-        return config;
+        return Redisson.create(config);
     }
 
     public String getAddress() {
