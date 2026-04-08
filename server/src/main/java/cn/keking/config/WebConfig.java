@@ -1,5 +1,6 @@
 package cn.keking.config;
 
+import cn.keking.service.RankService;
 import cn.keking.web.filter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,18 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<PreviewCountFilter> getPreviewCountFilter(RankService rankService) {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        PreviewCountFilter filter = new PreviewCountFilter(rankService);
+        FilterRegistrationBean<PreviewCountFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(100);
         return registrationBean;
     }
 }
