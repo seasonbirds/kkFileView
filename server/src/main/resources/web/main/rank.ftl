@@ -65,8 +65,7 @@
         <h1>最受欢迎文件排行榜</h1>
         统计各文件的预览次数，预览次数越多排名越靠前。
     </div>
-    
-    <#if rankEnabled>
+
     <div class="panel panel-success">
         <div class="panel-heading">
             <h3 class="panel-title">
@@ -84,34 +83,6 @@
             <table id="rankTable" class="table table-striped table-hover"></table>
         </div>
     </div>
-    <#else>
-    <div class="panel panel-warning">
-        <div class="panel-heading">
-            <h3 class="panel-title">功能未启用</h3>
-        </div>
-        <div class="panel-body">
-            <div class="alert alert-warning" role="alert">
-                <strong>提示：</strong>文件预览排行榜功能未启用。
-                <br><br>
-                如需启用，请在配置文件中添加以下配置：
-                <br><br>
-                <code>rank.redis.enabled=true</code>
-                <br>
-                <code>rank.redis.address=127.0.0.1:6379</code>
-                <br>
-                <code>rank.redis.database=1</code>
-                <br><br>
-                配置说明：
-                <ul>
-                    <li><code>rank.redis.enabled</code>: 是否启用排行榜功能，true为启用，false为禁用</li>
-                    <li><code>rank.redis.address</code>: Redis服务器地址，格式为 host:port</li>
-                    <li><code>rank.redis.password</code>: Redis密码（可选）</li>
-                    <li><code>rank.redis.database</code>: Redis数据库索引，默认使用独立的数据库避免与系统原有Redis冲突</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    </#if>
 </div>
 
 <#if beian?? && beian != "default">
@@ -124,7 +95,7 @@
 
 <script>
     var currentTopN = ${topN};
-    
+
     function getRankBadge(rank) {
         var badgeClass = 'rank-other';
         if (rank === 1) {
@@ -136,7 +107,7 @@
         }
         return '<span class="rank-badge ' + badgeClass + '">' + rank + '</span>';
     }
-    
+
     function escapeHtml(text) {
         if (text === null || text === undefined) {
             return '';
@@ -145,23 +116,23 @@
         div.textContent = text;
         return div.innerHTML;
     }
-    
+
     function loadRankData(topN) {
         currentTopN = topN;
-        
+
         $('.top-btn').removeClass('btn-success').addClass('btn-default');
         $('.top-btn[data-top="' + topN + '"]').removeClass('btn-default').addClass('btn-success');
-        
+
         $.getJSON('${baseUrl}api/rank?topN=' + topN, function(data) {
-            if (data.enabled && data.data) {
+            if (data.data) {
                 $('#rankTable').bootstrapTable('load', data.data);
             }
         });
     }
-    
+
     $(function() {
         $('.top-btn[data-top="' + currentTopN + '"]').removeClass('btn-default').addClass('btn-success');
-        
+
         $('#rankTable').bootstrapTable({
             url: '${baseUrl}api/rank?topN=' + currentTopN,
             method: 'get',
@@ -193,7 +164,7 @@
                 }
             }]
         });
-        
+
         $('.top-btn').click(function() {
             var topN = $(this).data('top');
             loadRankData(topN);

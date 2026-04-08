@@ -9,9 +9,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ClassUtils;
 
+/**
+ * 文件预览排行榜Redis配置类
+ * 使用独立的Redis配置，不影响系统原有的Redis缓存功能
+ * 配置前缀：rank.redis.*
+ *
+ * @author kkFileView
+ */
 @ConfigurationProperties(prefix = "rank.redis")
 @Configuration
-public class RankRedisConfig {
+public class mvn {
 
     private String address = "127.0.0.1:6379";
     private int connectionMinimumIdleSize = 5;
@@ -32,13 +39,16 @@ public class RankRedisConfig {
     private int dnsMonitoringInterval = 5000;
     private int thread = 4;
     private String codec = "org.redisson.codec.JsonJacksonCodec";
-    private boolean enabled = false;
 
+    /**
+     * 创建排行榜Redis配置
+     * 使用独立的数据库（默认database=1），避免与系统原有Redis缓存冲突
+     *
+     * @return Redisson配置对象
+     * @throws Exception 配置创建异常
+     */
     @Bean(name = "rankRedisConfig")
     public Config rankRedisConfig() throws Exception {
-        if (!enabled) {
-            return null;
-        }
         Config config = new Config();
         config.useSingleServer().setAddress("redis://" + address)
                 .setConnectionMinimumIdleSize(connectionMinimumIdleSize)
@@ -212,13 +222,5 @@ public class RankRedisConfig {
 
     public void setCodec(String codec) {
         this.codec = codec;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 }
