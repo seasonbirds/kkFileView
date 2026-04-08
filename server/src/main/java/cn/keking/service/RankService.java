@@ -7,7 +7,6 @@ import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
@@ -15,38 +14,51 @@ import jakarta.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 文件预览排行榜服务类
+ * 基于Redis的Sorted Set实现文件预览次数统计和排行榜功能
+ *
+ * 实现说明：
+ * 1. 使用Redis的Sorted Set数据结构，这是实现排行榜的最优方式
+ * 2. 预览次数统计使用异步操作，不阻塞主流程
+ * 3. Redis操作天然支持原子性，保证高并发场景下的线程安全
+ *
+ * @author kkFileView
+ */
 @Service
 public class RankService {
 
     private static final Logger logger = LoggerFactory.getLogger(RankService.class);
+
     private static final String RANK_KEY = "kkFileView:file:preview:rank";
     private static final String FILE_NAME_PREFIX = "kkFileView:file:name:";
 
     private final RankRedisConfig rankRedisConfig;
     private RedissonClient redissonClient;
-    private boolean enabled = false;
 
     public RankService(RankRedisConfig rankRedisConfig) {
         this.rankRedisConfig = rankRedisConfig;
     }
 
+    /**
+     * 初始化Redis客户端
+     * 在服务启动时创建Redisson连接
+     */
     @PostConstruct
     public void init() {
-        this.enabled = rankRedisConfig.isEnabled();
-        if (enabled) {
-            try {
-                Config config = rankRedisConfig.rankRedisConfig();
-                if (config != null) {
-                    this.redissonClient = Redisson.create(config);
-                    logger.info("Rank Redis client initialized successfully");
-                }
-            } catch (Exception e) {
-                logger.error("Failed to initialize Rank Redis client: {}", e.getMessage());
-                this.enabled = false;
-            }
+        try {
+            Config config = rankRedisConfig.rankRedisConfig();
+            this.redissonClient = Redisson.create(config);
+            logger.info("Rank Redis client initialized successfully");
+        } catch (Exception e) {
+            logger.error("Failed to initialize Rank Redis client: {}", e.getMessage());
         }
     }
 
+    /**
+     * 销毁Redis客户端
+     * 在服务关闭时释放Redisson连接
+     */
     @PreDestroy
     public void destroy() {
         if (redissonClient != null) {
@@ -55,12 +67,16 @@ public class RankService {
         }
     }
 
-    public boolean isEnabled() {
-        return enabled && redissonClient != null;
-    }
-
+    /**
+     * 增加文件预览次数
+     * 使用Redis的Sorted Set原子操作，天然支持高并发
+     * 使用异步操作，不影响核心预览接口性能
+     *
+     * @param fileUrl 文件URL（作为唯一标识）
+     * @param fileName 文件名称（用于显示）
+     */
     public void incrementPreviewCount(String fileUrl, String fileName) {
-        if (!isEnabled()) {
+        if (redissonClient == null) {
             return;
         }
         try {
@@ -74,9 +90,16 @@ public class RankService {
         }
     }
 
+    /**
+     * 获取最受欢迎文件排行榜
+     * 按预览次数从高到低排序
+     *
+     * @param topN 获取前N名
+     * @return 排行榜列表
+     */
     public List<RankItem> getTopFiles(int topN) {
         List<RankItem> result = new ArrayList<>();
-        if (!isEnabled()) {
+        if (redissonClient == null) {
             return result;
         }
         try {
@@ -95,8 +118,15 @@ public class RankService {
         return result;
     }
 
+    /**
+     * 获取文件名称
+     * 优先从Redis中获取存储的文件名，如果没有则从URL中提取
+     *
+     * @param fileUrl 文件URL
+     * @return 文件名称
+     */
     private String getFileName(String fileUrl) {
-        if (!isEnabled()) {
+        if (redissonClient == null) {
             return extractFileNameFromUrl(fileUrl);
         }
         try {
@@ -110,6 +140,12 @@ public class RankService {
         return extractFileNameFromUrl(fileUrl);
     }
 
+    /**
+     * 从URL中提取文件名
+     *
+     * @param fileUrl 文件URL
+     * @return 提取的文件名
+     */
     private String extractFileNameFromUrl(String fileUrl) {
         if (fileUrl == null || fileUrl.isEmpty()) {
             return "unknown";
@@ -125,6 +161,9 @@ public class RankService {
         return fileUrl;
     }
 
+    /**
+     * 排行榜数据项
+     */
     public static class RankItem {
         private int rank;
         private String fileUrl;
