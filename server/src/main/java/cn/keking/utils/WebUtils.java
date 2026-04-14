@@ -371,4 +371,57 @@ public class WebUtils {
         }
         session.removeAttribute(key);
     }
+
+    /**
+     * 获取客户端真实IP地址
+     * 考虑反向代理的情况，依次检查常见的代理头
+     * @param request HTTP请求
+     * @return 客户端真实IP地址
+     */
+    public static String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (isValidIp(ip)) {
+            int index = ip.indexOf(',');
+            if (index != -1) {
+                ip = ip.substring(0, index);
+            }
+            return ip.trim();
+        }
+
+        ip = request.getHeader("X-Real-IP");
+        if (isValidIp(ip)) {
+            return ip;
+        }
+
+        ip = request.getHeader("Proxy-Client-IP");
+        if (isValidIp(ip)) {
+            return ip;
+        }
+
+        ip = request.getHeader("WL-Proxy-Client-IP");
+        if (isValidIp(ip)) {
+            return ip;
+        }
+
+        ip = request.getHeader("HTTP_CLIENT_IP");
+        if (isValidIp(ip)) {
+            return ip;
+        }
+
+        ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        if (isValidIp(ip)) {
+            return ip;
+        }
+
+        ip = request.getRemoteAddr();
+        if (ip == null) {
+            ip = "unknown";
+        }
+
+        return ip;
+    }
+
+    private static boolean isValidIp(String ip) {
+        return ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip);
+    }
 }

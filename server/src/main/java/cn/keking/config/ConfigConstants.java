@@ -72,7 +72,6 @@ public class ConfigConstants {
     private static int pdfTimeout200;
     private static int pdfThread;
 
-    private static Boolean rateLimitEnabled;
     private static int rateLimitWindowSeconds;
     private static int rateLimitMaxRequests;
 
@@ -120,7 +119,6 @@ public class ConfigConstants {
     public static final String DEFAULT_PDF_TIMEOUT200 = "300";
     public static final String DEFAULT_PDF_THREAD = "5";
 
-    public static final String DEFAULT_RATE_LIMIT_ENABLED = "true";
     public static final String DEFAULT_RATE_LIMIT_WINDOW_SECONDS = "60";
     public static final String DEFAULT_RATE_LIMIT_MAX_REQUESTS = "10";
 
@@ -819,19 +817,6 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
-    }
-
-    public static Boolean isRateLimitEnabled() {
-        return rateLimitEnabled != null ? rateLimitEnabled : Boolean.parseBoolean(DEFAULT_RATE_LIMIT_ENABLED);
-    }
-
-    @Value("${rate.limit.enabled:true}")
-    public void setRateLimitEnabled(String rateLimitEnabled) {
-        setRateLimitEnabledValue(Boolean.parseBoolean(rateLimitEnabled));
-    }
-
-    public static void setRateLimitEnabledValue(Boolean rateLimitEnabled) {
-        ConfigConstants.rateLimitEnabled = rateLimitEnabled;
     }
 
     public static int getRateLimitWindowSeconds() {
