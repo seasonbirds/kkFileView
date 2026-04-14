@@ -3,8 +3,6 @@ package cn.keking.web.filter.ratelimit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * IP限流器
  * 基于IP地址的固定窗口限流算法
@@ -13,20 +11,30 @@ import java.util.concurrent.ConcurrentHashMap;
  * 1. 每个IP有一个时间窗口（m秒）
  * 2. 在时间窗口内，最多允许访问n次
  * 3. 时间窗口结束后，计数重置，开始新的窗口
+ * 
+ * 使用RateLimitCache接口存储数据，通过RateLimitCacheFactory获取缓存实例
+ * 便于后续扩展不同的缓存实现
  */
 public class IpRateLimiter {
 
     private static final Logger logger = LoggerFactory.getLogger(IpRateLimiter.class);
 
-    private final ConcurrentHashMap<String, RateLimitData> ipDataMap = new ConcurrentHashMap<>();
-
+    private final RateLimitCache cache;
     private final int windowSeconds;
     private final int maxRequests;
 
     public IpRateLimiter(int windowSeconds, int maxRequests) {
+        this.cache = RateLimitCacheFactory.getInstance();
         this.windowSeconds = windowSeconds;
         this.maxRequests = maxRequests;
         logger.info("IpRateLimiter initialized: window={}s, maxRequests={}", windowSeconds, maxRequests);
+    }
+
+    public IpRateLimiter(RateLimitCache cache, int windowSeconds, int maxRequests) {
+        this.cache = cache;
+        this.windowSeconds = windowSeconds;
+        this.maxRequests = maxRequests;
+        logger.info("IpRateLimiter initialized with custom cache: window={}s, maxRequests={}", windowSeconds, maxRequests);
     }
 
     /**
@@ -44,11 +52,11 @@ public class IpRateLimiter {
             long now = System.currentTimeMillis();
             long windowMillis = windowSeconds * 1000L;
 
-            RateLimitData data = ipDataMap.get(ip);
+            RateLimitData data = cache.get(ip);
 
             if (data == null) {
                 data = new RateLimitData(1, now);
-                ipDataMap.put(ip, data);
+                cache.set(ip, data);
                 logger.debug("New IP {}: count=1, windowStart={}", ip, now);
                 return true;
             }
@@ -58,6 +66,7 @@ public class IpRateLimiter {
             if (now > windowEndTime) {
                 data.setCount(1);
                 data.setWindowStartTime(now);
+                cache.set(ip, data);
                 logger.debug("IP {}: window expired, reset count=1, new windowStart={}", ip, now);
                 return true;
             }
@@ -69,6 +78,7 @@ public class IpRateLimiter {
             }
 
             data.incrementCount();
+            cache.set(ip, data);
             logger.debug("IP {}: request allowed, count={}/{}", ip, data.getCount(), maxRequests);
             return true;
 
