@@ -72,6 +72,10 @@ public class ConfigConstants {
     private static int pdfTimeout200;
     private static int pdfThread;
 
+    private static Boolean rateLimitEnabled;
+    private static int rateLimitWindowSeconds;
+    private static int rateLimitMaxRequests;
+
     public static final String DEFAULT_CACHE_ENABLED = "true";
     public static final String DEFAULT_TXT_TYPE = "txt,html,htm,asp,jsp,xml,json,properties,md,gitignore,log,java,py,c,cpp,sql,sh,bat,m,bas,prg,cmd,xbrl";
     public static final String DEFAULT_MEDIA_TYPE = "mp3,wav,mp4,flv";
@@ -115,6 +119,10 @@ public class ConfigConstants {
     public static final String DEFAULT_PDF_TIMEOUT80 = "180";
     public static final String DEFAULT_PDF_TIMEOUT200 = "300";
     public static final String DEFAULT_PDF_THREAD = "5";
+
+    public static final String DEFAULT_RATE_LIMIT_ENABLED = "true";
+    public static final String DEFAULT_RATE_LIMIT_WINDOW_SECONDS = "60";
+    public static final String DEFAULT_RATE_LIMIT_MAX_REQUESTS = "10";
 
     public static Boolean isCacheEnabled() {
         return cacheEnabled;
@@ -811,6 +819,53 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
+    }
+
+    public static Boolean isRateLimitEnabled() {
+        return rateLimitEnabled != null ? rateLimitEnabled : Boolean.parseBoolean(DEFAULT_RATE_LIMIT_ENABLED);
+    }
+
+    @Value("${rate.limit.enabled:true}")
+    public void setRateLimitEnabled(String rateLimitEnabled) {
+        setRateLimitEnabledValue(Boolean.parseBoolean(rateLimitEnabled));
+    }
+
+    public static void setRateLimitEnabledValue(Boolean rateLimitEnabled) {
+        ConfigConstants.rateLimitEnabled = rateLimitEnabled;
+    }
+
+    public static int getRateLimitWindowSeconds() {
+        return rateLimitWindowSeconds > 0 ? rateLimitWindowSeconds : Integer.parseInt(DEFAULT_RATE_LIMIT_WINDOW_SECONDS);
+    }
+
+    @Value("${rate.limit.window.seconds:60}")
+    public void setRateLimitWindowSeconds(String rateLimitWindowSeconds) {
+        try {
+            setRateLimitWindowSecondsValue(Integer.parseInt(rateLimitWindowSeconds));
+        } catch (NumberFormatException e) {
+            setRateLimitWindowSecondsValue(Integer.parseInt(DEFAULT_RATE_LIMIT_WINDOW_SECONDS));
+        }
+    }
+
+    public static void setRateLimitWindowSecondsValue(int rateLimitWindowSeconds) {
+        ConfigConstants.rateLimitWindowSeconds = rateLimitWindowSeconds;
+    }
+
+    public static int getRateLimitMaxRequests() {
+        return rateLimitMaxRequests > 0 ? rateLimitMaxRequests : Integer.parseInt(DEFAULT_RATE_LIMIT_MAX_REQUESTS);
+    }
+
+    @Value("${rate.limit.max.requests:10}")
+    public void setRateLimitMaxRequests(String rateLimitMaxRequests) {
+        try {
+            setRateLimitMaxRequestsValue(Integer.parseInt(rateLimitMaxRequests));
+        } catch (NumberFormatException e) {
+            setRateLimitMaxRequestsValue(Integer.parseInt(DEFAULT_RATE_LIMIT_MAX_REQUESTS));
+        }
+    }
+
+    public static void setRateLimitMaxRequestsValue(int rateLimitMaxRequests) {
+        ConfigConstants.rateLimitMaxRequests = rateLimitMaxRequests;
     }
 
 }
