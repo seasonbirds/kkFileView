@@ -1,6 +1,7 @@
 package cn.keking.web.filter.ratelimit;
 
 import cn.keking.config.ConfigConstants;
+import cn.keking.utils.WebUtils;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -24,23 +25,15 @@ public class RateLimitFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(RateLimitFilter.class);
 
-    private static final String TARGET_PATH = "/onlinePreview";
     private static final String RATE_LIMIT_MESSAGE = "请求太频繁，请稍后再试";
 
-    private RateLimitService rateLimitService;
-    private boolean rateLimitEnabled = true;
+    private IpRateLimiter rateLimiter;
 
     @Override
     public void init(FilterConfig filterConfig) {
         try {
             int windowSeconds = ConfigConstants.getRateLimitWindowSeconds();
             int maxRequests = ConfigConstants.getRateLimitMaxRequests();
-            rateLimitEnabled = ConfigConstants.isRateLimitEnabled();
-
-            if (!rateLimitEnabled) {
-                logger.info("Rate limit is disabled in configuration");
-                return;
-            }
 
             if (windowSeconds <= 0) {
                 logger.warn("Invalid rate limit window seconds: {}, using default: 60", windowSeconds);
@@ -51,15 +44,11 @@ public class RateLimitFilter implements Filter {
                 maxRequests = 10;
             }
 
-            RateLimitCache cache = RateLimitCacheFactory.getInstance();
-            rateLimitService = new RateLimitService(cache, windowSeconds, maxRequests);
-
-            logger.info("RateLimitFilter initialized: enabled={}, window={}s, maxRequests={}",
-                    rateLimitEnabled, windowSeconds, maxRequests);
+            rateLimiter = new IpRateLimiter(windowSeconds, maxRequests);
+            logger.info("RateLimitFilter initialized: window={}s, maxRequests={}", windowSeconds, maxRequests);
 
         } catch (Exception e) {
-            logger.error("Failed to initialize RateLimitFilter, rate limiting will be disabled", e);
-            rateLimitEnabled = false;
+            logger.error("Failed to initialize RateLimitFilter", e);
         }
     }
 
@@ -67,23 +56,16 @@ public class RateLimitFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        if (!rateLimitEnabled || rateLimitService == null) {
+        if (rateLimiter == null) {
             chain.doFilter(request, response);
             return;
         }
 
         try {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
-            String requestPath = httpRequest.getRequestURI();
+            String clientIp = WebUtils.getClientIp(httpRequest);
 
-            if (!isTargetPath(requestPath)) {
-                chain.doFilter(request, response);
-                return;
-            }
-
-            String clientIp = getClientIp(httpRequest);
-
-            if (rateLimitService.isAllowed(clientIp)) {
+            if (rateLimiter.isAllowed(clientIp)) {
                 chain.doFilter(request, response);
             } else {
                 handleRateLimitExceeded(response, clientIp);
@@ -95,75 +77,11 @@ public class RateLimitFilter implements Filter {
         }
     }
 
-    /**
-     * 判断是否为目标路径
-     */
-    private boolean isTargetPath(String requestPath) {
-        if (requestPath == null) {
-            return false;
-        }
-        return requestPath.endsWith(TARGET_PATH) || requestPath.contains(TARGET_PATH);
-    }
-
-    /**
-     * 获取客户端真实IP地址
-     * 考虑反向代理的情况
-     */
-    private String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (isValidIp(ip)) {
-            int index = ip.indexOf(',');
-            if (index != -1) {
-                ip = ip.substring(0, index);
-            }
-            return ip.trim();
-        }
-
-        ip = request.getHeader("X-Real-IP");
-        if (isValidIp(ip)) {
-            return ip;
-        }
-
-        ip = request.getHeader("Proxy-Client-IP");
-        if (isValidIp(ip)) {
-            return ip;
-        }
-
-        ip = request.getHeader("WL-Proxy-Client-IP");
-        if (isValidIp(ip)) {
-            return ip;
-        }
-
-        ip = request.getHeader("HTTP_CLIENT_IP");
-        if (isValidIp(ip)) {
-            return ip;
-        }
-
-        ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        if (isValidIp(ip)) {
-            return ip;
-        }
-
-        ip = request.getRemoteAddr();
-        if (ip == null) {
-            ip = "unknown";
-        }
-
-        return ip;
-    }
-
-    private boolean isValidIp(String ip) {
-        return ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip);
-    }
-
-    /**
-     * 处理超出限流的情况
-     */
     private void handleRateLimitExceeded(ServletResponse response, String clientIp) throws IOException {
         logger.warn("Rate limit exceeded for IP: {}", clientIp);
 
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        httpResponse.setStatus(HttpServletResponse.SC_TOO_MANY_REQUESTS);
+        httpResponse.setStatus(429);
         httpResponse.setContentType("text/html;charset=UTF-8");
         httpResponse.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
@@ -172,9 +90,6 @@ public class RateLimitFilter implements Filter {
         httpResponse.getWriter().flush();
     }
 
-    /**
-     * 构建HTML响应页面
-     */
     private String buildHtmlResponse() {
         return "<!DOCTYPE html>" +
                 "<html lang=\"zh-CN\">" +
