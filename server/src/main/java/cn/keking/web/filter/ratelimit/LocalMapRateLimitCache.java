@@ -1,6 +1,7 @@
 package cn.keking.web.filter.ratelimit;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 
 /**
  * 基于本地ConcurrentHashMap的限流缓存实现
@@ -24,5 +25,15 @@ public class LocalMapRateLimitCache implements RateLimitCache {
     @Override
     public void remove(String ip) {
         ipDataMap.remove(ip);
+    }
+
+    @Override
+    public RateLimitData putIfAbsent(String ip, RateLimitData data) {
+        return ipDataMap.putIfAbsent(ip, data);
+    }
+
+    @Override
+    public RateLimitData compute(String ip, BiFunction<String, RateLimitData, RateLimitData> remappingFunction) {
+        return ipDataMap.compute(ip, remappingFunction);
     }
 }
