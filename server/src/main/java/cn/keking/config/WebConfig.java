@@ -1,5 +1,7 @@
 package cn.keking.config;
 
+import cn.keking.audit.filter.AuditFilter;
+import cn.keking.audit.service.UserBehaviorService;
 import cn.keking.web.filter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +99,20 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<AttributeSetFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<AuditFilter> getAuditFilter(UserBehaviorService userBehaviorService) {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        filterUri.add("/picturesPreview");
+        filterUri.add("/getCorsFile");
+        AuditFilter filter = new AuditFilter(userBehaviorService);
+        FilterRegistrationBean<AuditFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(5);
         return registrationBean;
     }
 }
