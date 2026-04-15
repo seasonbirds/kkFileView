@@ -1,8 +1,10 @@
 package cn.keking.config;
 
 import cn.keking.web.filter.*;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +39,29 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<ChinesePathFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setOrder(10);
+        return registrationBean;
+    }
+
+    /**
+     * 单点登录认证过滤器
+     * 用于校验用户登录状态和文件预览权限
+     * 执行顺序设为5，在其他安全检查之前执行
+     *
+     * @param authRedissonClient 业务系统Redis客户端
+     * @return FilterRegistrationBean
+     */
+    @Bean
+    public FilterRegistrationBean<AuthFilter> getAuthFilter(
+            @Qualifier("authRedissonClient") RedissonClient authRedissonClient) {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/onlinePreview");
+        filterUri.add("/picturesPreview");
+        filterUri.add("/getCorsFile");
+        AuthFilter filter = new AuthFilter(authRedissonClient);
+        FilterRegistrationBean<AuthFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(5);
         return registrationBean;
     }
 

@@ -71,10 +71,8 @@ public class ConfigConstants {
     private static int pdfTimeout80;
     private static int pdfTimeout200;
     private static int pdfThread;
-    private static Boolean authEnabled;
 
     public static final String DEFAULT_CACHE_ENABLED = "true";
-    public static final String DEFAULT_AUTH_ENABLED = "false";
     public static final String DEFAULT_TXT_TYPE = "txt,html,htm,asp,jsp,xml,json,properties,md,gitignore,log,java,py,c,cpp,sql,sh,bat,m,bas,prg,cmd,xbrl";
     public static final String DEFAULT_MEDIA_TYPE = "mp3,wav,mp4,flv";
     public static final String DEFAULT_OFFICE_PREVIEW_TYPE = "image";
@@ -813,19 +811,6 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
-    }
-
-    public static Boolean isAuthEnabled() {
-        return authEnabled != null && authEnabled;
-    }
-
-    @Value("${auth.enabled:false}")
-    public void setAuthEnabled(String authEnabled) {
-        setAuthEnabledValue(Boolean.parseBoolean(authEnabled));
-    }
-
-    public static void setAuthEnabledValue(Boolean authEnabled) {
-        ConfigConstants.authEnabled = authEnabled;
     }
 
 }
