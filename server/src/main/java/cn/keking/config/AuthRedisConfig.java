@@ -8,6 +8,7 @@ import org.redisson.client.codec.Codec;
 import org.redisson.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,11 +19,18 @@ import org.springframework.util.ClassUtils;
  * 用于连接业务系统的Redis，获取用户登录信息
  * 与系统自身的缓存Redis配置相互独立，互不影响
  *
+ * <p>启用条件：
+ * <ul>
+ *     <li>配置 auth.redis.address 后自动启用</li>
+ *     <li>不配置则不创建此Bean，认证功能不启用</li>
+ * </ul>
+ *
  * @author kkFileView
  * @since 2026/04/15
  */
 @ConfigurationProperties(prefix = "auth.redis")
 @Configuration
+@ConditionalOnProperty(prefix = "auth.redis", name = "address", havingValue = ".+", matchIfMissing = false)
 public class AuthRedisConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthRedisConfig.class);
@@ -87,11 +95,6 @@ public class AuthRedisConfig {
      */
     @Bean(name = "authRedissonClient")
     public RedissonClient authRedissonClient() throws Exception {
-        if (StringUtils.isBlank(address)) {
-            logger.warn("业务系统Redis地址未配置，单点登录认证功能将不会启用");
-            return null;
-        }
-
         logger.info("初始化业务系统Redis客户端，地址: {}", address);
 
         Config config = new Config();
