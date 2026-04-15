@@ -7,8 +7,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Properties;
 
 /**
  * SQLite数据源配置类
@@ -36,10 +35,10 @@ public class SQLiteDataSourceConfig {
 
         dataSource.setUrl("jdbc:sqlite:" + dbPath);
 
-        Map<String, String> connectionProperties = new HashMap<>();
-        connectionProperties.put("foreign_keys", "true");
-        connectionProperties.put("journal_mode", "WAL");
-        connectionProperties.put("synchronous", "NORMAL");
+        Properties connectionProperties = new Properties();
+        connectionProperties.setProperty("foreign_keys", "true");
+        connectionProperties.setProperty("journal_mode", "WAL");
+        connectionProperties.setProperty("synchronous", "NORMAL");
         dataSource.setConnectionProperties(connectionProperties);
 
         return dataSource;
