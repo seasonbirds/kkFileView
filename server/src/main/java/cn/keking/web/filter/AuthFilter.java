@@ -143,7 +143,6 @@ public class AuthFilter implements Filter {
      *
      * <p>认证流程：
      * <ol>
-     *     <li>如果Redis客户端未配置，直接放行（兼容未启用认证的场景）</li>
      *     <li>从Cookie中获取Token，无Token则提示"请先登录系统"</li>
      *     <li>根据Token从Redis获取用户信息，不存在则提示"登录状态已失效"</li>
      *     <li>校验用户权限，无权限则提示"无相关权限"</li>
@@ -159,11 +158,6 @@ public class AuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
-        if (authRedissonClient == null) {
-            chain.doFilter(request, response);
-            return;
-        }
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;

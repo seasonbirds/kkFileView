@@ -5,6 +5,7 @@ import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,10 +48,17 @@ public class WebConfig implements WebMvcConfigurer {
      * 用于校验用户登录状态和文件预览权限
      * 执行顺序设为5，在其他安全检查之前执行
      *
+     * <p>启用条件：
+     * <ul>
+     *     <li>配置了 auth.redis.address 后自动启用</li>
+     *     <li>不配置则不启用此Filter</li>
+     * </ul>
+     *
      * @param authRedissonClient 业务系统Redis客户端
      * @return FilterRegistrationBean
      */
     @Bean
+    @ConditionalOnBean(name = "authRedissonClient")
     public FilterRegistrationBean<AuthFilter> getAuthFilter(
             @Qualifier("authRedissonClient") RedissonClient authRedissonClient) {
         Set<String> filterUri = new HashSet<>();
