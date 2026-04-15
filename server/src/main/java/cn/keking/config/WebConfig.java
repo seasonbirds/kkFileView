@@ -103,12 +103,13 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public FilterRegistrationBean<AuditFilter> getAuditFilter(UserBehaviorService userBehaviorService) {
+    public FilterRegistrationBean<AuditFilter> getAuditFilter(UserBehaviorService userBehaviorService,
+                                                                 org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer freeMarkerConfigurer) {
         Set<String> filterUri = new HashSet<>();
         filterUri.add("/onlinePreview");
         filterUri.add("/picturesPreview");
         filterUri.add("/getCorsFile");
-        AuditFilter filter = new AuditFilter(userBehaviorService);
+        AuditFilter filter = new AuditFilter(userBehaviorService, freeMarkerConfigurer);
         FilterRegistrationBean<AuditFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
         registrationBean.setUrlPatterns(filterUri);
