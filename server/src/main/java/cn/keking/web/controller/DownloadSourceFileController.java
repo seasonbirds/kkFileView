@@ -16,14 +16,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 下载源文件Controller
- * <p>
- * 提供办公文件（doc/docx、xls/xlsx、ppt/pptx等）的源文件下载功能。
+ *
+ * 提供办公文件的源文件下载功能。
  *
  * @author keking
  */
@@ -31,6 +35,16 @@ import java.nio.file.Files;
 public class DownloadSourceFileController {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadSourceFileController.class);
+
+    private static final Set<String> OFFICE_SUFFIXES = new HashSet<>(Arrays.asList(
+            "doc", "docx", "docm", "dot", "dotx", "dotm",
+            "xls", "xlsx", "xlsm", "csv", "xlt", "xltx", "xltm", "xlam",
+            "ppt", "pptx",
+            "vsd", "vsdx",
+            "rtf",
+            "wps", "et", "dps", "ett",
+            "odt", "ods", "odp"
+    ));
 
     private final FileHandlerService fileHandlerService;
 
@@ -40,9 +54,6 @@ public class DownloadSourceFileController {
 
     /**
      * 下载源文件接口
-     * <p>
-     * 接收Base64编码的文件URL，下载转换前的源文件。
-     * 仅允许下载办公类型文件。
      *
      * @param url      Base64编码的文件URL
      * @param request  HTTP请求对象
@@ -51,22 +62,8 @@ public class DownloadSourceFileController {
      */
     @GetMapping("/downloadSourceFile")
     public void downloadSourceFile(String url, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String fileUrl;
-        try {
-            fileUrl = WebUtils.decodeUrl(url);
-        } catch (Exception ex) {
-            String errorMsg = String.format(OnlinePreviewController.BASE64_DECODE_ERROR_MSG, "url");
-            logger.error(errorMsg, ex);
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":400,\"message\":\"" + errorMsg + "\"}");
-            return;
-        }
-
-        if (!StringUtils.hasText(fileUrl)) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":400,\"message\":\"url参数为空\"}");
+        String fileUrl = decodeUrl(url, response);
+        if (fileUrl == null) {
             return;
         }
 
@@ -78,9 +75,7 @@ public class DownloadSourceFileController {
 
         if (!isOfficeFile(suffix)) {
             logger.warn("Not an office file, suffix: {}", suffix);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":403,\"message\":\"仅允许下载办公文件\"}");
+            writeErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "仅允许下载办公文件");
             return;
         }
 
@@ -89,22 +84,13 @@ public class DownloadSourceFileController {
 
         try {
             if (fileUrl.toLowerCase().startsWith("file:")) {
-                java.net.URL urlObj = new java.net.URL(fileUrl);
-                String path = urlObj.getPath();
-                if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-                    if (path.startsWith("/") && path.length() > 2 && path.charAt(2) == ':') {
-                        path = path.substring(1);
-                    }
-                }
-                localFilePath = path;
+                localFilePath = extractLocalFilePath(fileUrl);
                 isLocalFile = true;
             } else {
                 ReturnResponse<String> downloadResponse = DownloadUtils.downLoad(fileAttribute, fileName);
                 if (downloadResponse.isFailure()) {
                     logger.error("Download source file failed: {}", downloadResponse.getMsg());
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    response.setContentType("application/json;charset=UTF-8");
-                    response.getWriter().write("{\"code\":500,\"message\":\"下载文件失败：" + downloadResponse.getMsg() + "\"}");
+                    writeErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "下载文件失败：" + downloadResponse.getMsg());
                     return;
                 }
                 localFilePath = downloadResponse.getContent();
@@ -113,31 +99,14 @@ public class DownloadSourceFileController {
             File file = new File(localFilePath);
             if (!file.exists()) {
                 logger.error("Source file not exists: {}", localFilePath);
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"code\":404,\"message\":\"文件不存在\"}");
+                writeErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, "文件不存在");
                 return;
             }
 
             try {
-                String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
-                response.setContentType("application/octet-stream");
-                response.setHeader("Content-Disposition", "attachment;filename*=UTF-8''" + encodedFileName);
-                response.setHeader("Content-Length", String.valueOf(file.length()));
-
-                try (FileInputStream fis = new FileInputStream(file)) {
-                    byte[] buffer = new byte[4096];
-                    int bytesRead;
-                    while ((bytesRead = fis.read(buffer)) != -1) {
-                        response.getOutputStream().write(buffer, 0, bytesRead);
-                    }
-                    response.getOutputStream().flush();
-                }
-
+                setDownloadResponseHeaders(response, fileName, file.length());
+                copyFileToResponse(file, response);
                 logger.info("Download source file success: {}", fileName);
-            } catch (IOException e) {
-                logger.error("Stream download failed", e);
-                throw e;
             } finally {
                 if (!isLocalFile && localFilePath != null) {
                     try {
@@ -147,43 +116,68 @@ public class DownloadSourceFileController {
                     }
                 }
             }
+
         } catch (Exception e) {
             logger.error("Download source file error", e);
             if (!response.isCommitted()) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"code\":500,\"message\":\"服务器内部错误\"}");
+                writeErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "服务器内部错误");
             }
         }
     }
 
-    /**
-     * 判断是否为办公文件
-     * <p>
-     * 支持的办公文件类型包括：
-     * - Word文档：doc、docx、docm、dot、dotx、dotm、rtf
-     * - Excel文档：xls、xlsx、xlsm、csv、xlt、xltx、xltm、xlam
-     * - PPT文档：ppt、pptx
-     * - Visio文档：vsd、vsdx
-     * - WPS文档：wps、et、dps、ett
-     * - OpenOffice文档：odt、ods、odp
-     *
-     * @param suffix 文件后缀（不含点号）
-     * @return 是否为办公文件
-     */
-    private boolean isOfficeFile(String suffix) {
-        if (suffix == null) {
-            return false;
+    private String decodeUrl(String url, HttpServletResponse response) throws IOException {
+        try {
+            String fileUrl = WebUtils.decodeUrl(url);
+            if (!StringUtils.hasText(fileUrl)) {
+                writeErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "url参数为空");
+                return null;
+            }
+            return fileUrl;
+        } catch (Exception ex) {
+            String errorMsg = String.format(OnlinePreviewController.BASE64_DECODE_ERROR_MSG, "url");
+            logger.error(errorMsg, ex);
+            writeErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, errorMsg);
+            return null;
         }
-        String lowerSuffix = suffix.toLowerCase();
-        return lowerSuffix.equals("doc") || lowerSuffix.equals("docx") || lowerSuffix.equals("docm") ||
-               lowerSuffix.equals("xls") || lowerSuffix.equals("xlsx") || lowerSuffix.equals("xlsm") ||
-               lowerSuffix.equals("csv") || lowerSuffix.equals("ppt") || lowerSuffix.equals("pptx") ||
-               lowerSuffix.equals("vsd") || lowerSuffix.equals("vsdx") || lowerSuffix.equals("rtf") ||
-               lowerSuffix.equals("wps") || lowerSuffix.equals("et") || lowerSuffix.equals("dps") ||
-               lowerSuffix.equals("odt") || lowerSuffix.equals("ods") || lowerSuffix.equals("odp") ||
-               lowerSuffix.equals("dot") || lowerSuffix.equals("dotx") || lowerSuffix.equals("dotm") ||
-               lowerSuffix.equals("xlt") || lowerSuffix.equals("xltx") || lowerSuffix.equals("xltm") ||
-               lowerSuffix.equals("ett") || lowerSuffix.equals("xlam"));
+    }
+
+    private String extractLocalFilePath(String fileUrl) throws IOException {
+        java.net.URL urlObj = new java.net.URL(fileUrl);
+        String path = urlObj.getPath();
+        if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+            if (path.startsWith("/") && path.length() > 2 && path.charAt(2) == ':') {
+                path = path.substring(1);
+            }
+        }
+        return path;
+    }
+
+    private void setDownloadResponseHeaders(HttpServletResponse response, String fileName, long fileSize) throws IOException {
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment;filename*=UTF-8''" + encodedFileName);
+        response.setHeader("Content-Length", String.valueOf(fileSize));
+    }
+
+    private void copyFileToResponse(File file, HttpServletResponse response) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file);
+             OutputStream os = response.getOutputStream()) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+            os.flush();
+        }
+    }
+
+    private void writeErrorResponse(HttpServletResponse response, int status, String message) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"code\":" + status + ",\"message\":\"" + message + "\"}");
+    }
+
+    private boolean isOfficeFile(String suffix) {
+        return suffix != null && OFFICE_SUFFIXES.contains(suffix.toLowerCase());
     }
 }
