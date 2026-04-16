@@ -20,6 +20,18 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+/**
+ * 下载源文件Controller
+ * <p>
+ * 提供办公文件（doc/docx、xls/xlsx、ppt/pptx等）的源文件下载功能。
+ * 支持以下协议：
+ * - HTTP/HTTPS：远程文件下载
+ * - file：本地文件系统
+ * <p>
+ * 注意：不支持FTP协议。
+ *
+ * @author keking
+ */
 @Controller
 public class DownloadSourceFileController {
 
@@ -31,6 +43,17 @@ public class DownloadSourceFileController {
         this.fileHandlerService = fileHandlerService;
     }
 
+    /**
+     * 下载源文件接口
+     * <p>
+     * 接收Base64编码的文件URL，下载转换前的源文件。
+     * 仅允许下载办公类型文件。
+     *
+     * @param url      Base64编码的文件URL
+     * @param request  HTTP请求对象
+     * @param response HTTP响应对象
+     * @throws IOException IO异常
+     */
     @GetMapping("/downloadSourceFile")
     public void downloadSourceFile(String url, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String fileUrl;
@@ -53,6 +76,14 @@ public class DownloadSourceFileController {
         }
 
         logger.info("Download source file request, url: {}", fileUrl);
+
+        if (fileUrl.toLowerCase().startsWith("ftp:")) {
+            logger.warn("FTP protocol is not supported for download, url: {}", fileUrl);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"code\":403,\"message\":\"不支持FTP协议下载\"}");
+            return;
+        }
 
         FileAttribute fileAttribute = fileHandlerService.getFileAttribute(fileUrl, request);
         String fileName = fileAttribute.getName();
@@ -139,6 +170,20 @@ public class DownloadSourceFileController {
         }
     }
 
+    /**
+     * 判断是否为办公文件
+     * <p>
+     * 支持的办公文件类型包括：
+     * - Word文档：doc、docx、docm、dot、dotx、dotm、rtf
+     * - Excel文档：xls、xlsx、xlsm、csv、xlt、xltx、xltm、xlam
+     * - PPT文档：ppt、pptx
+     * - Visio文档：vsd、vsdx
+     * - WPS文档：wps、et、dps、ett
+     * - OpenOffice文档：odt、ods、odp
+     *
+     * @param suffix 文件后缀（不含点号）
+     * @return 是否为办公文件
+     */
     private boolean isOfficeFile(String suffix) {
         if (suffix == null) {
             return false;

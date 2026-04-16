@@ -44,7 +44,7 @@
 
             <div class="nav-collapse collapse">
                 <p class="navbar-text pull-right">
-                    <#if downloadSourceFileEnabled && isOfficeFile?? && isOfficeFile>
+                    <#if isOfficeFile?? && isOfficeFile>
                         <a href="#" onclick="downloadSourceFile(); return false;" title="下载源文件" style="color: #fff; margin-right: 15px;">下载源文件</a>
                     </#if>
                     <a href="#" title="全屏" class="fullscreen-link"><i class="icon-fullscreen icon-white"></i></a>

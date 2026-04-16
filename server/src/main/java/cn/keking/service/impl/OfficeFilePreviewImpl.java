@@ -57,7 +57,6 @@ public class OfficeFilePreviewImpl implements FilePreview {
 
         model.addAttribute("originalFileUrl", url);
         model.addAttribute("isOfficeFile", true);
-        model.addAttribute("fileName", fileName);
 
         if (!officePreviewType.equalsIgnoreCase("html")) {
             if (ConfigConstants.getOfficeTypeWeb() .equalsIgnoreCase("web")) {
