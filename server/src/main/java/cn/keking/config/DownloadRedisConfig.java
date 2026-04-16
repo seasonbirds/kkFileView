@@ -13,6 +13,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ClassUtils;
 
+/**
+ * 下载限流Redis配置类
+ * <p>
+ * 提供独立的Redis客户端配置，用于下载源文件接口的限流功能。
+ * 与系统原有缓存Redis配置完全隔离，互不影响。
+ * <p>
+ * 配置前缀：download.redis
+ * 启用条件：download.redis.enabled = true
+ *
+ * @author keking
+ */
 @Configuration
 @ConfigurationProperties(prefix = "download.redis")
 @ConditionalOnProperty(name = "download.redis.enabled", havingValue = "true")
@@ -36,6 +47,14 @@ public class DownloadRedisConfig {
 
     private RedissonClient redissonClient;
 
+    /**
+     * 创建下载限流专用的Redisson客户端
+     * <p>
+     * 该客户端与系统原有缓存Redis客户端完全隔离，
+     * 使用独立的配置和连接池。
+     *
+     * @return RedissonClient实例
+     */
     @Bean(name = "downloadRedissonClient")
     public RedissonClient downloadRedissonClient() {
         if (redissonClient != null) {
@@ -52,6 +71,12 @@ public class DownloadRedisConfig {
         }
     }
 
+    /**
+     * 创建Redisson配置
+     *
+     * @return Redisson配置对象
+     * @throws Exception 配置创建异常
+     */
     private Config createConfig() throws Exception {
         Config config = new Config();
         config.useSingleServer()

@@ -1,7 +1,7 @@
 package cn.keking.web.filter;
 
 import cn.keking.config.ConfigConstants;
-import cn.keking.config.DownloadRedisConfig;
+import cn.keking.utils.WebUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +20,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 下载源文件限流过滤器
+ * <p>
+ * 实现以下限流逻辑：
+ * 1. 同一个IP地址在一个文件没下载完成前，不能下载其他文件
+ * 2. 同时只能允许m个不同IP地址下载文件，m可配置
+ * <p>
+ * 限流基于Redis实现，支持集群部署。
+ * 如果Redis不可用，则限流不生效（降级策略）。
+ *
+ * @author keking
+ */
 public class DownloadRateLimitFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadRateLimitFilter.class);
@@ -30,8 +42,7 @@ public class DownloadRateLimitFilter implements Filter {
     private static final String RATE_LIMIT_ERROR_MSG = "请求太频繁，请稍后再试";
 
     private RedissonClient redissonClient;
-    private DownloadRedisConfig downloadRedisConfig;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -39,7 +50,6 @@ public class DownloadRateLimitFilter implements Filter {
         if (context != null) {
             try {
                 redissonClient = context.getBean("downloadRedissonClient", RedissonClient.class);
-                downloadRedisConfig = context.getBean(DownloadRedisConfig.class);
                 logger.info("DownloadRateLimitFilter initialized with Redis");
             } catch (Exception e) {
                 logger.warn("Download Redis client not available, rate limiting disabled: {}", e.getMessage());
@@ -52,31 +62,21 @@ public class DownloadRateLimitFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String clientIp = getClientIp(httpRequest);
+        String clientIp = WebUtils.getClientIp(httpRequest);
         String url = httpRequest.getRequestURI();
         String fileUrl = httpRequest.getParameter("url");
 
         logger.info("Download request from IP: {}, URL: {}", clientIp, url);
 
-        if (ConfigConstants.getDownloadSourceFileEnabled() == null || !ConfigConstants.getDownloadSourceFileEnabled()) {
-            writeErrorResponse(httpResponse, HttpServletResponse.SC_FORBIDDEN, "下载功能已禁用");
-            return;
-        }
-
-        if (redissonClient == null || downloadRedisConfig == null || !downloadRedisConfig.isEnabled()) {
+        if (redissonClient == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        Integer maxIp = ConfigConstants.getDownloadRateLimitMaxIp();
-        if (maxIp == null) {
-            maxIp = 10;
-        }
-
-        Integer timeout = ConfigConstants.getDownloadRateLimitTimeout();
-        if (timeout == null) {
-            timeout = 300;
-        }
+        int maxIp = ConfigConstants.getDownloadRateLimitMaxIp() != null ? 
+                ConfigConstants.getDownloadRateLimitMaxIp() : 10;
+        int timeout = ConfigConstants.getDownloadRateLimitTimeout() != null ? 
+                ConfigConstants.getDownloadRateLimitTimeout() : 300;
 
         RSet<String> activeIps = redissonClient.getSet(DOWNLOAD_IP_SET);
         RMap<String, String> ipFileMap = redissonClient.getMap(DOWNLOAD_IP_FILE_MAP);
@@ -140,29 +140,6 @@ public class DownloadRateLimitFilter implements Filter {
             logger.error("Download rate limit error", e);
             writeErrorResponse(httpResponse, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "服务器内部错误");
         }
-    }
-
-    private String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        if (ip != null && ip.contains(",")) {
-            ip = ip.split(",")[0].trim();
-        }
-        return ip != null ? ip : "unknown";
     }
 
     private void writeErrorResponse(HttpServletResponse response, int status, String message) throws IOException {

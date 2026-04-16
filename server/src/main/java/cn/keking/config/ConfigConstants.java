@@ -72,7 +72,6 @@ public class ConfigConstants {
     private static int pdfTimeout200;
     private static int pdfThread;
 
-    private static Boolean downloadSourceFileEnabled;
     private static Integer downloadRateLimitMaxIp;
     private static Integer downloadRateLimitTimeout;
 
@@ -120,7 +119,6 @@ public class ConfigConstants {
     public static final String DEFAULT_PDF_TIMEOUT200 = "300";
     public static final String DEFAULT_PDF_THREAD = "5";
 
-    public static final String DEFAULT_DOWNLOAD_SOURCE_FILE_ENABLED = "true";
     public static final String DEFAULT_DOWNLOAD_RATE_LIMIT_MAX_IP = "10";
     public static final String DEFAULT_DOWNLOAD_RATE_LIMIT_TIMEOUT = "300";
 
@@ -819,19 +817,6 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
-    }
-
-    public static Boolean getDownloadSourceFileEnabled() {
-        return downloadSourceFileEnabled;
-    }
-
-    @Value("${download.source.file.enabled:true}")
-    public void setDownloadSourceFileEnabled(String downloadSourceFileEnabled) {
-        setDownloadSourceFileEnabledValue(Boolean.parseBoolean(downloadSourceFileEnabled));
-    }
-
-    public static void setDownloadSourceFileEnabledValue(Boolean downloadSourceFileEnabled) {
-        ConfigConstants.downloadSourceFileEnabled = downloadSourceFileEnabled;
     }
 
     public static Integer getDownloadRateLimitMaxIp() {
