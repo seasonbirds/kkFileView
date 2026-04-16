@@ -40,6 +40,13 @@
 <#if "false" == switchDisabled>
     <img src="images/pdf.svg" width="48" height="48" style="position: fixed; cursor: pointer; top: 40%; right: 48px; z-index: 999;" alt="使用PDF预览" title="使用PDF预览" onclick="changePreviewType('pdf')"/>
 </#if>
+<#if downloadSourceFileEnabled && isOfficeFile?? && isOfficeFile>
+    <div style="position: fixed; top: 20px; right: 48px; z-index: 999;">
+        <button onclick="downloadSourceFile()" style="background-color: #1890ff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px;">
+            下载源文件
+        </button>
+    </div>
+</#if>
 <script>
     window.onload = function () {
         /*初始化水印*/
@@ -59,6 +66,14 @@
         } else {
             window.location.href = url;
         }
+    }
+    function downloadSourceFile() {
+        var url = '${originalFileUrl}';
+        var baseUrl = '${baseUrl}';
+        if (!baseUrl.endsWith('/')) {
+            baseUrl = baseUrl + '/';
+        }
+        window.location.href = baseUrl + 'downloadSourceFile?url=' + encodeURIComponent(url);
     }
 </script>
 </body>

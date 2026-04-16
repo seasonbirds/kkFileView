@@ -44,21 +44,25 @@ public class OfficeFilePreviewImpl implements FilePreview {
 
     @Override
     public String filePreviewHandle(String url, Model model, FileAttribute fileAttribute) {
-        // 预览Type，参数传了就取参数的，没传取系统默认
         String officePreviewType = fileAttribute.getOfficePreviewType();
         boolean userToken = fileAttribute.getUsePasswordCache();
         String baseUrl = BaseUrlFilter.getBaseUrl();
-        String suffix = fileAttribute.getSuffix();  //获取文件后缀
-        String fileName = fileAttribute.getName(); //获取文件原始名称
-        String filePassword = fileAttribute.getFilePassword(); //获取密码
-        boolean forceUpdatedCache=fileAttribute.forceUpdatedCache();  //是否启用强制更新命令
-        boolean isHtmlView = fileAttribute.isHtmlView();  //xlsx  转换成html
-        String cacheName = fileAttribute.getCacheName();  //转换后的文件名
-        String outFilePath = fileAttribute.getOutFilePath();  //转换后生成文件的路径
+        String suffix = fileAttribute.getSuffix();
+        String fileName = fileAttribute.getName();
+        String filePassword = fileAttribute.getFilePassword();
+        boolean forceUpdatedCache=fileAttribute.forceUpdatedCache();
+        boolean isHtmlView = fileAttribute.isHtmlView();
+        String cacheName = fileAttribute.getCacheName();
+        String outFilePath = fileAttribute.getOutFilePath();
+
+        model.addAttribute("originalFileUrl", url);
+        model.addAttribute("isOfficeFile", true);
+        model.addAttribute("fileName", fileName);
+
         if (!officePreviewType.equalsIgnoreCase("html")) {
             if (ConfigConstants.getOfficeTypeWeb() .equalsIgnoreCase("web")) {
                 if (suffix.equalsIgnoreCase("xlsx")) {
-                    model.addAttribute("pdfUrl", KkFileUtils.htmlEscape(url)); //特殊符号处理
+                    model.addAttribute("pdfUrl", KkFileUtils.htmlEscape(url));
                     return XLSX_FILE_PREVIEW_PAGE;
                 }
                 if (suffix.equalsIgnoreCase("csv")) {

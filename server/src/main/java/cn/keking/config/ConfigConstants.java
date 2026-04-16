@@ -72,6 +72,10 @@ public class ConfigConstants {
     private static int pdfTimeout200;
     private static int pdfThread;
 
+    private static Boolean downloadSourceFileEnabled;
+    private static Integer downloadRateLimitMaxIp;
+    private static Integer downloadRateLimitTimeout;
+
     public static final String DEFAULT_CACHE_ENABLED = "true";
     public static final String DEFAULT_TXT_TYPE = "txt,html,htm,asp,jsp,xml,json,properties,md,gitignore,log,java,py,c,cpp,sql,sh,bat,m,bas,prg,cmd,xbrl";
     public static final String DEFAULT_MEDIA_TYPE = "mp3,wav,mp4,flv";
@@ -115,6 +119,10 @@ public class ConfigConstants {
     public static final String DEFAULT_PDF_TIMEOUT80 = "180";
     public static final String DEFAULT_PDF_TIMEOUT200 = "300";
     public static final String DEFAULT_PDF_THREAD = "5";
+
+    public static final String DEFAULT_DOWNLOAD_SOURCE_FILE_ENABLED = "true";
+    public static final String DEFAULT_DOWNLOAD_RATE_LIMIT_MAX_IP = "10";
+    public static final String DEFAULT_DOWNLOAD_RATE_LIMIT_TIMEOUT = "300";
 
     public static Boolean isCacheEnabled() {
         return cacheEnabled;
@@ -811,6 +819,45 @@ public class ConfigConstants {
 
     public static void setHomeSearchValue(String homeSearch) {
         ConfigConstants.homeSearch = homeSearch;
+    }
+
+    public static Boolean getDownloadSourceFileEnabled() {
+        return downloadSourceFileEnabled;
+    }
+
+    @Value("${download.source.file.enabled:true}")
+    public void setDownloadSourceFileEnabled(String downloadSourceFileEnabled) {
+        setDownloadSourceFileEnabledValue(Boolean.parseBoolean(downloadSourceFileEnabled));
+    }
+
+    public static void setDownloadSourceFileEnabledValue(Boolean downloadSourceFileEnabled) {
+        ConfigConstants.downloadSourceFileEnabled = downloadSourceFileEnabled;
+    }
+
+    public static Integer getDownloadRateLimitMaxIp() {
+        return downloadRateLimitMaxIp;
+    }
+
+    @Value("${download.rate.limit.max.ip:10}")
+    public void setDownloadRateLimitMaxIp(String downloadRateLimitMaxIp) {
+        setDownloadRateLimitMaxIpValue(Integer.parseInt(downloadRateLimitMaxIp));
+    }
+
+    public static void setDownloadRateLimitMaxIpValue(Integer downloadRateLimitMaxIp) {
+        ConfigConstants.downloadRateLimitMaxIp = downloadRateLimitMaxIp;
+    }
+
+    public static Integer getDownloadRateLimitTimeout() {
+        return downloadRateLimitTimeout;
+    }
+
+    @Value("${download.rate.limit.timeout:300}")
+    public void setDownloadRateLimitTimeout(String downloadRateLimitTimeout) {
+        setDownloadRateLimitTimeoutValue(Integer.parseInt(downloadRateLimitTimeout));
+    }
+
+    public static void setDownloadRateLimitTimeoutValue(Integer downloadRateLimitTimeout) {
+        ConfigConstants.downloadRateLimitTimeout = downloadRateLimitTimeout;
     }
 
 }
