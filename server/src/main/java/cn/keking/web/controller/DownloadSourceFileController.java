@@ -24,11 +24,6 @@ import java.nio.file.Files;
  * 下载源文件Controller
  * <p>
  * 提供办公文件（doc/docx、xls/xlsx、ppt/pptx等）的源文件下载功能。
- * 支持以下协议：
- * - HTTP/HTTPS：远程文件下载
- * - file：本地文件系统
- * <p>
- * 注意：不支持FTP协议。
  *
  * @author keking
  */
@@ -76,14 +71,6 @@ public class DownloadSourceFileController {
         }
 
         logger.info("Download source file request, url: {}", fileUrl);
-
-        if (fileUrl.toLowerCase().startsWith("ftp:")) {
-            logger.warn("FTP protocol is not supported for download, url: {}", fileUrl);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":403,\"message\":\"不支持FTP协议下载\"}");
-            return;
-        }
 
         FileAttribute fileAttribute = fileHandlerService.getFileAttribute(fileUrl, request);
         String fileName = fileAttribute.getName();

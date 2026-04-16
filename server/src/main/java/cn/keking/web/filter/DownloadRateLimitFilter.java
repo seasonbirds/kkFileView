@@ -89,7 +89,7 @@ public class DownloadRateLimitFilter implements Filter {
             boolean acquired = lock.tryLock(5, timeout, TimeUnit.SECONDS);
             if (!acquired) {
                 logger.warn("IP {} failed to acquire download lock", clientIp);
-                writeErrorResponse(httpResponse, HttpServletResponse.SC_TOO_MANY_REQUESTS, RATE_LIMIT_ERROR_MSG);
+                writeErrorResponse(httpResponse, 429, RATE_LIMIT_ERROR_MSG);
                 return;
             }
 
@@ -98,7 +98,7 @@ public class DownloadRateLimitFilter implements Filter {
                 if (ipCurrentFile != null && !ipCurrentFile.isEmpty()) {
                     if (!ipCurrentFile.equals(currentFileKey)) {
                         logger.warn("IP {} is already downloading another file: {}", clientIp, ipCurrentFile);
-                        writeErrorResponse(httpResponse, HttpServletResponse.SC_TOO_MANY_REQUESTS, RATE_LIMIT_ERROR_MSG);
+                        writeErrorResponse(httpResponse, 429, RATE_LIMIT_ERROR_MSG);
                         return;
                     }
                 }
@@ -106,7 +106,7 @@ public class DownloadRateLimitFilter implements Filter {
                 int activeCount = activeIps.size();
                 if (activeCount >= maxIp && !activeIps.contains(clientIp)) {
                     logger.warn("Too many active downloads, active: {}, max: {}", activeCount, maxIp);
-                    writeErrorResponse(httpResponse, HttpServletResponse.SC_TOO_MANY_REQUESTS, RATE_LIMIT_ERROR_MSG);
+                    writeErrorResponse(httpResponse, 429, RATE_LIMIT_ERROR_MSG);
                     return;
                 }
 

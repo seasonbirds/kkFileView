@@ -71,11 +71,11 @@ public class OfficeFilePreviewImpl implements FilePreview {
             }
         }
         if (forceUpdatedCache|| !fileHandlerService.listConvertedFiles().containsKey(cacheName) || !ConfigConstants.isCacheEnabled()) {
-        // 下载远程文件到本地，如果文件在本地已存在不会重复下载
-        ReturnResponse<String> response = DownloadUtils.downLoad(fileAttribute, fileName);
-        if (response.isFailure()) {
-            return otherFilePreview.notSupportedFile(model, fileAttribute, response.getMsg());
-        }
+            // 下载远程文件到本地，如果文件在本地已存在不会重复下载
+            ReturnResponse<String> response = DownloadUtils.downLoad(fileAttribute, fileName);
+            if (response.isFailure()) {
+                return otherFilePreview.notSupportedFile(model, fileAttribute, response.getMsg());
+            }
             String filePath = response.getContent();
             boolean  isPwdProtectedOffice =  OfficeUtils.isPwdProtected(filePath);    // 判断是否加密文件
             if (isPwdProtectedOffice && !StringUtils.hasLength(filePassword)) {

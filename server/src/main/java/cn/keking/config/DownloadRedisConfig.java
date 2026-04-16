@@ -7,7 +7,6 @@ import org.redisson.client.codec.Codec;
 import org.redisson.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,18 +19,15 @@ import org.springframework.util.ClassUtils;
  * 与系统原有缓存Redis配置完全隔离，互不影响。
  * <p>
  * 配置前缀：download.redis
- * 启用条件：download.redis.enabled = true
  *
  * @author keking
  */
 @Configuration
 @ConfigurationProperties(prefix = "download.redis")
-@ConditionalOnProperty(name = "download.redis.enabled", havingValue = "true")
 public class DownloadRedisConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadRedisConfig.class);
 
-    private boolean enabled = false;
     private String address = "127.0.0.1:6379";
     private String password = null;
     private int database = 1;
@@ -98,14 +94,6 @@ public class DownloadRedisConfig {
         }
         config.setEventLoopGroup(new NioEventLoopGroup());
         return config;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     public String getAddress() {
