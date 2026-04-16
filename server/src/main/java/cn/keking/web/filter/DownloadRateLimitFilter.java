@@ -22,13 +22,12 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 下载源文件限流过滤器
- * <p>
- * 实现以下限流逻辑：
+ *
+ * 限流逻辑：
  * 1. 同一个IP地址在一个文件没下载完成前，不能下载其他文件
  * 2. 同时只能允许m个不同IP地址下载文件，m可配置
- * <p>
- * 限流基于Redis实现，支持集群部署。
- * 如果Redis不可用，则限流不生效（降级策略）。
+ *
+ * 基于Redis实现，支持集群部署。如果Redis不可用，则限流不生效。
  *
  * @author keking
  */
@@ -63,27 +62,22 @@ public class DownloadRateLimitFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String clientIp = WebUtils.getClientIp(httpRequest);
-        String url = httpRequest.getRequestURI();
-        String fileUrl = httpRequest.getParameter("url");
-
-        logger.info("Download request from IP: {}, URL: {}", clientIp, url);
 
         if (redissonClient == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        int maxIp = ConfigConstants.getDownloadRateLimitMaxIp() != null ? 
-                ConfigConstants.getDownloadRateLimitMaxIp() : 10;
-        int timeout = ConfigConstants.getDownloadRateLimitTimeout() != null ? 
-                ConfigConstants.getDownloadRateLimitTimeout() : 300;
+        int maxIp = getOrDefault(ConfigConstants.getDownloadRateLimitMaxIp(), 10);
+        int timeout = getOrDefault(ConfigConstants.getDownloadRateLimitTimeout(), 300);
+
+        String fileUrl = httpRequest.getParameter("url");
+        String currentFileKey = clientIp + ":" + (fileUrl != null ? fileUrl : "unknown");
 
         RSet<String> activeIps = redissonClient.getSet(DOWNLOAD_IP_SET);
         RMap<String, String> ipFileMap = redissonClient.getMap(DOWNLOAD_IP_FILE_MAP);
 
-        String currentFileKey = clientIp + ":" + (fileUrl != null ? fileUrl : "unknown");
-        String lockKey = DOWNLOAD_LOCK_PREFIX + clientIp;
-        RLock lock = redissonClient.getLock(lockKey);
+        RLock lock = redissonClient.getLock(DOWNLOAD_LOCK_PREFIX + clientIp);
 
         try {
             boolean acquired = lock.tryLock(5, timeout, TimeUnit.SECONDS);
@@ -95,12 +89,10 @@ public class DownloadRateLimitFilter implements Filter {
 
             try {
                 String ipCurrentFile = ipFileMap.get(clientIp);
-                if (ipCurrentFile != null && !ipCurrentFile.isEmpty()) {
-                    if (!ipCurrentFile.equals(currentFileKey)) {
-                        logger.warn("IP {} is already downloading another file: {}", clientIp, ipCurrentFile);
-                        writeErrorResponse(httpResponse, 429, RATE_LIMIT_ERROR_MSG);
-                        return;
-                    }
+                if (ipCurrentFile != null && !ipCurrentFile.isEmpty() && !ipCurrentFile.equals(currentFileKey)) {
+                    logger.warn("IP {} is already downloading another file: {}", clientIp, ipCurrentFile);
+                    writeErrorResponse(httpResponse, 429, RATE_LIMIT_ERROR_MSG);
+                    return;
                 }
 
                 int activeCount = activeIps.size();
@@ -112,7 +104,6 @@ public class DownloadRateLimitFilter implements Filter {
 
                 activeIps.add(clientIp);
                 ipFileMap.put(clientIp, currentFileKey);
-
                 activeIps.expire(timeout, TimeUnit.SECONDS);
                 ipFileMap.expire(timeout, TimeUnit.SECONDS);
 
@@ -140,6 +131,10 @@ public class DownloadRateLimitFilter implements Filter {
             logger.error("Download rate limit error", e);
             writeErrorResponse(httpResponse, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "服务器内部错误");
         }
+    }
+
+    private int getOrDefault(Integer value, int defaultValue) {
+        return value != null ? value : defaultValue;
     }
 
     private void writeErrorResponse(HttpServletResponse response, int status, String message) throws IOException {
