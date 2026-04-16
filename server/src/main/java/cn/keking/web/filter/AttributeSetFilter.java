@@ -47,6 +47,7 @@ public class AttributeSetFilter implements Filter {
         request.setAttribute("homePagination", ConfigConstants.getHomePagination());
         request.setAttribute("homePageSize", ConfigConstants.getHomePageSize());
         request.setAttribute("homeSearch", ConfigConstants.getHomeSearch());
+        request.setAttribute("downloadSourceFileEnabled", ConfigConstants.getDownloadSourceFileEnabled());
     }
 
     /**

@@ -99,4 +99,16 @@ public class WebConfig implements WebMvcConfigurer {
         registrationBean.setUrlPatterns(filterUri);
         return registrationBean;
     }
+
+    @Bean
+    public FilterRegistrationBean<DownloadRateLimitFilter> getDownloadRateLimitFilter() {
+        Set<String> filterUri = new HashSet<>();
+        filterUri.add("/downloadSourceFile");
+        DownloadRateLimitFilter filter = new DownloadRateLimitFilter();
+        FilterRegistrationBean<DownloadRateLimitFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(filter);
+        registrationBean.setUrlPatterns(filterUri);
+        registrationBean.setOrder(25);
+        return registrationBean;
+    }
 }
