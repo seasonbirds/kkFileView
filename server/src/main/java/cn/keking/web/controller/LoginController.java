@@ -57,15 +57,8 @@ public class LoginController {
             return "redirect:/index";
         }
 
-        // 设置baseUrl到模型中
-        String baseUrl = BaseUrlFilter.getBaseUrl();
-        if (StringUtils.isNotBlank(baseUrl)) {
-            model.addAttribute("baseUrl", baseUrl);
-        } else {
-            model.addAttribute("baseUrl", request.getContextPath() + "/");
-        }
-
         // 返回登录页面
+        // baseUrl已通过BaseUrlFilter设置到request中，Freemarker配置了expose-request-attributes=true，会自动暴露到模板中
         return "/main/login";
     }
 
